@@ -2,12 +2,15 @@
   "name": "tfvm",
   "version": "1.0.0",
   "description": "terraform version manager",
-  "main": "index.js",
+  "main": "./bin/index.js",
+  "bin": {
+    "tfvm": "./bin/index.js"
+  },
   "repository": "https://github.com/andys-github/tfvm.git",
   "author": "Anindya Dey",
   "license": "MIT",
   "dependencies": {
-    "boxen": "^6.2.1",
+    "boxen": "4.0",
     "chalk": "^4.1.2",
     "yargs": "^17.2.1"
   }
