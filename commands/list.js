@@ -1,4 +1,3 @@
-const conf = new (require('conf'))();
 const chalk = require('chalk');
 const cheerio = require('cheerio');
 const got = require('got');
@@ -49,7 +48,7 @@ function list({ remote }) {
             })
 
     } else {
-        const terraformExecutables = conf.get('terraform-executables')
+        const terraformExecutables = []
 
         if (terraformExecutables && terraformExecutables.length) {
             //user has terraform executables
