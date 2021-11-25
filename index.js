@@ -9,4 +9,9 @@ program
   .description('List all the downloaded versions of terraform')
   .action(list)
 
+program
+  .command('dir')
+  .description('Displays the directory where terraform executables are stored')
+  .action(dir)
+
 program.parse()
