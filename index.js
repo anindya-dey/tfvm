@@ -14,7 +14,7 @@ program
 
 program
   .command('download [version]')
-  .description('Downloads a specific version of terraform')
+  .description('Downloads the latest version, or a specific version of terraform')
   .action(download)
 
 program
