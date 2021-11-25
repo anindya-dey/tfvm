@@ -5,9 +5,6 @@ const inquirer = require('inquirer');
 
 const { TERRAFORM_DOWNLOAD_URL } = require('../config');
 
-// register autocomplete plugin for inquirer
-inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
-
 function isTerraformLink(i, link) {
     // Return false if there is no href attribute.
     if (typeof link.attribs.href === 'undefined') { return false }
