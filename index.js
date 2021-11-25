@@ -4,6 +4,7 @@ const { program } = require('commander');
 
 const list = require('./commands/list')
 const download = require('./commands/download')
+const dir = require('./commands/dir')
 
 program
   .command('list')
