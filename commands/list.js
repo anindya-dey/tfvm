@@ -36,15 +36,16 @@ function list({ remote }) {
                         message: `Here is a list of terraform versions available at ${TERRAFORM_DOWNLOAD_URL}`,
                         choices: terraformVersions,
                         pageSize: 10,
-                        filter(val) {
-                            return val.toLowerCase()
-                        }
                     }]).then((answers) => {
                         console.log(answers)
                     })
 
             }).catch(err => {
-                console.log(err)
+                if (err.code === 'ENOTFOUND') {
+                    console.log(
+                        chalk.redBright.bold(`Could not connect to ${TERRAFORM_DOWNLOAD_URL}. Check your internet connection!`)
+                    )
+                }
             })
 
     } else {
