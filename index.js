@@ -9,6 +9,7 @@ const dir = require('./commands/dir')
 program
   .command('list')
   .description('List all the downloaded versions of terraform')
+  .option('-r', 'Displays a list of terraform versions available at https://releases.hashicorp.com/terraform/')
   .action(list)
 
 program
