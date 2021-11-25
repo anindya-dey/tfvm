@@ -26,5 +26,3 @@ program
   .action(dir)
 
 program.parse()
-
-"existence"
