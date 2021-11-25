@@ -3,7 +3,7 @@ const cheerio = require('cheerio');
 const got = require('got');
 const inquirer = require('inquirer');
 
-const { TERRAFORM_DOWNLOAD_URL } = require('../config');
+const { TERRAFORM_DOWNLOAD_URL, INSTALLATION_DIR } = require('../config');
 
 function isTerraformLink(i, link) {
     // Return false if there is no href attribute.
@@ -45,17 +45,22 @@ function list({ remote }) {
             })
 
     } else {
-        const terraformExecutables = []
+        const fs = require('fs');
+        let terraformExecutables = []
+        
+        if (fs.existsSync(INSTALLATION_DIR)) {
+            terraformExecutables = fs.readdirSync(INSTALLATION_DIR)
+        }
 
         if (terraformExecutables && terraformExecutables.length) {
             //user has terraform executables
             console.log(
-                chalk.blue.bold('Tasks in green are done. Tasks in yellow are still not done.')
+                chalk.blue.bold(`Here is a list of terraform executables present at ${INSTALLATION_DIR}`)
             )
 
             terraformExecutables.forEach((terraform, index) => {
                 console.log(
-                    chalk.greenBright(`${index}. ${terraform.version}`)
+                    chalk.greenBright(`  ${terraform}`)
                 )
             })
         } else {
