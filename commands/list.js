@@ -2,8 +2,12 @@ const conf = new (require('conf'))();
 const chalk = require('chalk');
 const cheerio = require('cheerio');
 const got = require('got');
+const inquirer = require('inquirer');
 
 const { TERRAFORM_DOWNLOAD_URL } = require('../config');
+
+// register autocomplete plugin for inquirer
+inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
 
 function isTerraformLink(i, link) {
     // Return false if there is no href attribute.
@@ -18,10 +22,27 @@ function list({ remote }) {
             .then(response => {
                 const $ = cheerio.load(response.body)
 
+                const terraformVersions = [];
+
                 $('a').filter(isTerraformLink).each((i, link) => {
-                    const href = link.attribs.href;
-                    console.log(href);
+                    const href = link.attribs.href.replace(/^\/terraform\//, '').replace(/\/$/, '');
+                    terraformVersions.push(href)
                 });
+
+                inquirer
+                    .prompt([{
+                        type: 'list',
+                        name: 'terraformVersion',
+                        message: `Here is a list of terraform versions available at ${TERRAFORM_DOWNLOAD_URL}`,
+                        choices: terraformVersions,
+                        pageSize: 10,
+                        filter(val) {
+                            return val.toLowerCase()
+                        }
+                    }]).then((answers) => {
+                        console.log(answers)
+                    })
+
             }).catch(err => {
                 console.log(err)
             })
