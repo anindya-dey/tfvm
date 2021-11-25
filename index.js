@@ -25,4 +25,6 @@ program
   .description('Displays the directory where terraform executables are stored')
   .action(dir)
 
-program.parse()
+program.showSuggestionAfterError();
+
+program.parse();
