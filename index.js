@@ -5,11 +5,13 @@ const { program } = require('commander');
 const list = require('./commands/list')
 const download = require('./commands/download')
 const dir = require('./commands/dir')
+const { TERRAFORM_DOWNLOAD_URL } = require('./config');
 
 program
   .command('list')
+  .alias('ls')
   .description('List all the downloaded versions of terraform')
-  .option('-r', 'Displays a list of terraform versions available at https://releases.hashicorp.com/terraform/')
+  .option('-r, --remote', `Displays a list of terraform versions available at ${TERRAFORM_DOWNLOAD_URL}`)
   .action(list)
 
 program
