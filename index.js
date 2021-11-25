@@ -5,6 +5,7 @@ const { program } = require('commander');
 const list = require('./commands/list')
 const download = require('./commands/download')
 const dir = require('./commands/dir')
+
 const { TERRAFORM_DOWNLOAD_URL } = require('./config');
 
 program

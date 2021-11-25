@@ -1,8 +1,7 @@
-const conf = new (require('conf'))()
 const chalk = require('chalk')
 
 function download(version) {
-    let terraformExecutables = conf.get('terraform-executables')
+    let terraformExecutables = []
 
     if (!terraformExecutables) {
         terraformExecutables = []
