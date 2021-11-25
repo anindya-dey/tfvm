@@ -4,7 +4,6 @@ const { program } = require('commander');
 
 const list = require('./commands/list')
 const download = require('./commands/download')
-const dir = require('./commands/dir')
 
 program
   .command('list')
@@ -12,7 +11,7 @@ program
   .action(list)
 
 program
-  .command('download <version>')
+  .command('download [version]')
   .description('Downloads a specific version of terraform')
   .action(download)
 
