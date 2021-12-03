@@ -1,9 +1,19 @@
-const chalk = require('chalk');
 const cheerio = require('cheerio');
 const got = require('got');
 const inquirer = require('inquirer');
 
-const { TERRAFORM_DOWNLOAD_URL, INSTALLATION_DIR } = require('../config');
+const {
+    TERRAFORM_DOWNLOAD_URL,
+    STORAGE_DIR
+} = require('../config');
+
+const {
+    printSuccess,
+    printError,
+    printInfo
+} = require('../utils/print');
+
+const { blue } = require('../utils/render');
 
 function isTerraformLink(i, link) {
     // Return false if there is no href attribute.
@@ -29,48 +39,38 @@ function list({ remote }) {
                     .prompt([{
                         type: 'list',
                         name: 'terraformVersion',
-                        message: `Here is a list of terraform versions available at ${TERRAFORM_DOWNLOAD_URL}`,
+                        message: blue(`Here is a list of terraform versions available at ${TERRAFORM_DOWNLOAD_URL}. Select one to download:`),
                         choices: terraformVersions,
                         pageSize: 10,
                     }]).then((answers) => {
-                        console.log(answers)
+                        printSuccess(JSON.stringify(answers, null, 4))
                     })
-
             }).catch(err => {
                 if (err.code === 'ENOTFOUND') {
-                    console.log(
-                        chalk.redBright.bold(`Could not connect to ${TERRAFORM_DOWNLOAD_URL}. Check your internet connection!`)
-                    )
+                    printError(`Could not connect to ${TERRAFORM_DOWNLOAD_URL}. Check your internet connection!`)
                 }
             })
-
     } else {
         const fs = require('fs');
         let terraformExecutables = []
-        
-        if (fs.existsSync(INSTALLATION_DIR)) {
-            terraformExecutables = fs.readdirSync(INSTALLATION_DIR)
+
+        if (fs.existsSync(STORAGE_DIR)) {
+            terraformExecutables = fs.readdirSync(STORAGE_DIR)
         }
 
         if (terraformExecutables && terraformExecutables.length) {
             //user has terraform executables
-            console.log(
-                chalk.blue.bold(`Here is a list of terraform executables present at ${INSTALLATION_DIR}`)
-            )
+            printInfo(`Here is a list of terraform executables present at ${STORAGE_DIR}`)
 
             terraformExecutables.forEach((terraform, index) => {
-                console.log(
-                    chalk.greenBright(`  ${terraform}`)
-                )
+                printSuccess(`  ${terraform}`)
             })
         } else {
             //user does not have any terraform executables
-            console.log(
-                chalk.red.bold('You don\'t have any terraform executables yet.')
-            )
+            printError(`You don\'t have any terraform executables at ${STORAGE_DIR}.`)
+            printInfo(`To configure an existing path or to set a new path, use tfvm dir -p "storage-path"`)
         }
     }
-
 }
 
 module.exports = list
