@@ -1,6 +1,6 @@
 {
   "name": "tfvm",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Terraform Version Manager",
   "bin": {
     "tfvm": "index.js"
@@ -14,7 +14,8 @@
     "commander": "^8.3.0",
     "got": "^11.8.3",
     "inquirer": "^8.2.0",
-    "rc": "^1.2.8"
+    "rc": "^1.2.8",
+    "update-notifier": "^5.1.0"
   },
   "keywords": [
     "terraform",
