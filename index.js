@@ -7,15 +7,18 @@ const list = require('./commands/list')
 const download = require('./commands/download')
 const dir = require('./commands/dir')
 
-// Notify user about any updates
-const pkg = require('./package.json');
-updateNotifier({pkg}).notify();
-
 const {
   TERRAFORM_DOWNLOAD_URL,
-  STORAGE_DIR,
+  UPDATE_INTERVAL,
   HOME_DIR
 } = require('./config');
+
+// Notify user about any updates
+const pkg = require('./package.json');
+updateNotifier({
+  pkg,
+  updateCheckInterval: UPDATE_INTERVAL
+}).notify();
 
 program.name("tfvm")
 
