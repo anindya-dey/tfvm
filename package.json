@@ -14,7 +14,8 @@
     "commander": "^8.3.0",
     "got": "^11.8.3",
     "inquirer": "^8.2.0",
-    "rc": "^1.2.8"
+    "rc": "^1.2.8",
+    "update-notifier": "^5.1.0"
   },
   "keywords": [
     "terraform",
