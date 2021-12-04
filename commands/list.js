@@ -68,7 +68,7 @@ function list({ remote }) {
         } else {
             //user does not have any terraform executables
             printError(`You don\'t have any terraform executables at ${STORAGE_DIR}.`)
-            printInfo(`To configure an existing path or to set a new path, use tfvm dir -p "storage-path"`)
+            printInfo(`To configure an existing path or to set a new path, use tfvm dir -p <path/to/store/terraform/executables>\n`)
         }
     }
 }
