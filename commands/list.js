@@ -6,11 +6,13 @@ const {
     TERRAFORM_DOWNLOAD_URL,
     STORAGE_DIR
 } = require('../config');
+const getTerraformVersions = require('../utils/get-terraform-versions');
 
 const {
     printSuccess,
     printError,
-    printInfo
+    printInfo,
+    print
 } = require('../utils/print');
 
 const { blue } = require('../utils/render');
@@ -60,16 +62,20 @@ function list({ remote }) {
 
         if (terraformExecutables && terraformExecutables.length) {
             //user has terraform executables
-            printInfo(`Here is a list of terraform executables present at ${STORAGE_DIR}`)
+            printInfo(`Here is a list of terraform executables present at ${STORAGE_DIR}:\n`)
 
             terraformExecutables.forEach((terraform, index) => {
-                printSuccess(`  ${terraform}`)
+                printSuccess(`\t${terraform}`)
             })
+
+            print('\n')
         } else {
             //user does not have any terraform executables
             printError(`You don\'t have any terraform executables at ${STORAGE_DIR}.`)
             printInfo(`To configure an existing path or to set a new path, use tfvm dir -p <path/to/store/terraform/executables>\n`)
         }
+
+        getTerraformVersions().then(terraformVersions => console.log(terraformVersions))
     }
 }
 

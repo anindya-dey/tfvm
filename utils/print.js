@@ -18,8 +18,13 @@ function printInfo(infoMessage) {
     )
 }
 
+function print(message) {
+    console.log(message)
+}
+
 module.exports = {
     printSuccess,
     printError,
-    printInfo
+    printInfo,
+    print
 }
