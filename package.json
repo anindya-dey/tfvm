@@ -1,6 +1,6 @@
 {
   "name": "tfvm",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "Terraform Version Manager",
   "bin": {
     "tfvm": "index.js"
