@@ -1,13 +1,13 @@
-const os = require('os');
-const path = require('path');
+import os from 'os';
+import path from 'path';
+import config from 'rc';
 
-const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
-
-const config = require('rc')('tfvm', {
+const conf = config('tfvm', {
     TERRAFORM_DOWNLOAD_URL: "https://releases.hashicorp.com/terraform",
     HOME_DIR: os.homedir(),
-    STORAGE_DIR: path.join(os.homedir(), 'terraform'),
-    UPDATE_INTERVAL: ONE_WEEK
-})
+    STORAGE_DIR: path.join(os.homedir(), 'terraform')
+});
 
-module.exports = config
+export const TERRAFORM_DOWNLOAD_URL = conf.TERRAFORM_DOWNLOAD_URL;
+export const HOME_DIR = conf.HOME_DIR;
+export const STORAGE_DIR = conf.STORAGE_DIR;

@@ -1,19 +1,19 @@
-const cheerio = require('cheerio');
-const got = require('got');
-const inquirer = require('inquirer');
+import cheerio from 'cheerio';
+import got from 'got';
+import inquirer from 'inquirer';
 
-const {
+import {
     TERRAFORM_DOWNLOAD_URL,
     STORAGE_DIR
-} = require('../config');
+} from '../config.js';
 
-const {
+import {
     printSuccess,
     printError,
     printInfo
-} = require('../utils/print');
+} from '../utils/print.js';
 
-const { blue } = require('../utils/render');
+import { blue } from '../utils/render.js';
 
 function isTerraformLink(i, link) {
     // Return false if there is no href attribute.
@@ -22,7 +22,7 @@ function isTerraformLink(i, link) {
     return link.attribs.href.startsWith('/terraform/');
 }
 
-function list({ remote }) {
+const list = ({ remote }) => {
     if (remote) {
         got(TERRAFORM_DOWNLOAD_URL)
             .then(response => {
@@ -73,4 +73,4 @@ function list({ remote }) {
     }
 }
 
-module.exports = list
+export default list;
