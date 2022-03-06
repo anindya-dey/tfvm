@@ -1,4 +1,4 @@
-const chalk = require("chalk");
+import chalk from "chalk";
 
 function red(text) {
     return chalk.redBright.bold(text)
@@ -12,6 +12,6 @@ function green(text) {
     return chalk.greenBright.bold(text)
 }
 
-module.exports = {
+export {
     red, blue, green
 }

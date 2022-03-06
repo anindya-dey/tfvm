@@ -1,11 +1,9 @@
-const chalk = require('chalk')
+import chalk from 'chalk';
 
-function download(version) {
+export default function download(version) {
     let terraformExecutables = []
 
     if (!terraformExecutables) {
         terraformExecutables = []
     }
 }
-
-module.exports = download
