@@ -1,4 +1,4 @@
-const { red, blue, green } = require("./render");
+import { red, blue, green } from "./render.js";
 
 function printSuccess(successMessage) {
     console.log(
@@ -18,7 +18,7 @@ function printInfo(infoMessage) {
     )
 }
 
-module.exports = {
+export {
     printSuccess,
     printError,
     printInfo
