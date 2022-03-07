@@ -1,20 +1,20 @@
-import { red, blue, green } from "./render.js";
+import chalk from "chalk";
 
 function printSuccess(successMessage) {
     console.log(
-       green(successMessage)
+        chalk.greenBright.bold(successMessage)
     )
 }
 
 function printError(errorMessage) {
     console.log(
-        red(errorMessage)
+        chalk.redBright.bold(errorMessage)
     )
 }
 
 function printInfo(infoMessage) {
     console.log(
-        blue(infoMessage)
+        chalk.blueBright.bold(infoMessage)
     )
 }
 
