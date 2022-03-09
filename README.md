@@ -13,7 +13,7 @@ $ npm install -g tfvm
 ```
 ## Available commands
 
-### `list|ls [--remote | -r]`
+#### `list|ls [--remote | -r]`
 Use this command to list the downloaded versions of terraform
 ```sh
 $ tfvm list # gets all the locally available terraform executables
@@ -24,14 +24,14 @@ Append `--remote` or `-r` with `list` to get a list of all available releases fr
 $ tfvm list --remote # displays the available releases from Terraform's website
 ```
 
-### `dir`
+#### `dir`
 This command shows the directory where all the terraform executables are stored locally. The default path is the `$USER/terraform` directory.
 ```sh
 $ tfvm dir # shows the directory where all the terraform executables are stored
 ```
 
-### `download|d [version]`
-Use it to view a list of available releases from terraform. Choose one with up/down arrow and hit `ENTER` to download it.
+#### `download|d [version]`
+This will present a list of available releases from terraform. Choose one with up/down arrow and hit `ENTER` to download it.
 ```sh
 $ tfvm download
 ``` 
