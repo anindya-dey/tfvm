@@ -1,6 +1,6 @@
 {
   "name": "tfvm",
-  "version": "0.2.14",
+  "version": "0.2.15",
   "description": "Terraform Version Manager",
   "author": "Anindya Dey",
   "repository": "https://github.com/andys-github/tfvm.git",
