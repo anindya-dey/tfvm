@@ -1,10 +1,8 @@
 const cheerio = require("cheerio");
 const got = require("got");
-const { TERRAFORM_DOWNLOAD_URL } = require("../config.js");
-const {
-  isTerraformLink,
-  extractTerraformExecutable,
-} = require("../utils/index.js");
+const { TERRAFORM_DOWNLOAD_URL } = require("../config");
+const isTerraformLink = require("./isTerraformLink");
+const extractTerraformExecutable = require("./extractTerraformExecutable");
 
 const listTerraformExecutables = async (version) => {
   const terraformExecutables = [];

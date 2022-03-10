@@ -3,9 +3,9 @@
 const { program } = require("commander");
 const updateNotifier = require("update-notifier");
 
-const list = require("./commands/list.js");
-const download = require("./commands/download.js");
-const dir = require("./commands/dir.js");
+const list = require("./commands/list");
+const download = require("./commands/download");
+const dir = require("./commands/dir");
 const {
   TERRAFORM_DOWNLOAD_URL,
   STORAGE_DIR,
