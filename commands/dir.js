@@ -1,9 +1,9 @@
-import fs from "fs";
+const fs = require("fs");
 
-import { STORAGE_DIR } from "../config.js";
-import { printSuccess, printError, printInfo } from "../utils/index.js";
+const { STORAGE_DIR } = require("../config.js");
+const { printSuccess, printError, printInfo } = require("../utils/index.js");
 
-export default function dir() {
+const dir = () => {
   if (fs.existsSync(STORAGE_DIR)) {
     printSuccess(
       `The configured path for your terraform executables is ${STORAGE_DIR}\n`
@@ -16,4 +16,6 @@ export default function dir() {
       `To update the storage path, run "tfvm dir -p <path/to/store/terraform/executables>"\n`
     );
   }
-}
+};
+
+module.exports = dir;

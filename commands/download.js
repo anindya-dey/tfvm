@@ -1,19 +1,19 @@
-import * as cheerio from "cheerio";
-import got from "got";
-import inquirer from "inquirer";
+const cheerio = require("cheerio");
+const got = require("got");
+const inquirer = require("inquirer");
 
-import { TERRAFORM_DOWNLOAD_URL, STORAGE_DIR } from "../config.js";
+const { TERRAFORM_DOWNLOAD_URL, STORAGE_DIR } = require("../config.js");
 
-import {
+const {
   printSuccess,
   printError,
   printInfo,
   isTerraformLink,
   extractTerraformLink,
   listTerraformExecutables,
-} from "../utils/index.js";
+} = require("../utils/index.js");
 
-export default function download(version) {
+const download = (version) => {
   let terraformExecutables = [];
 
   got(TERRAFORM_DOWNLOAD_URL)
@@ -42,18 +42,19 @@ export default function download(version) {
           ])
           .then(async (answers) => {
             printSuccess(JSON.stringify(answers, null, 4));
-            inquirer.prompt([
-              {
-                type: "list",
-                name: "selectedArchitecture",
-                message: "For which OS do you want to download?",
-                choices: await listTerraformExecutables(
-                  answers.selectedTerraformVersion
-                ),
-                pageSize: 10,
-              },
-            ])
-            .then(answers => console.log(JSON.stringify(answers, null, 4)));
+            inquirer
+              .prompt([
+                {
+                  type: "list",
+                  name: "selectedArchitecture",
+                  message: "For which OS do you want to download?",
+                  choices: await listTerraformExecutables(
+                    answers.selectedTerraformVersion
+                  ),
+                  pageSize: 10,
+                },
+              ])
+              .then((answers) => console.log(JSON.stringify(answers, null, 4)));
           });
       } else {
       }
@@ -65,4 +66,6 @@ export default function download(version) {
         );
       }
     });
-}
+};
+
+module.exports = download;

@@ -28,7 +28,6 @@
       "href": "https://www.npmjs.com/package/tfvm"
     }
   ],
-  "type": "module",
   "license": "MIT",
   "dependencies": {
     "chalk": "^4.1.2",

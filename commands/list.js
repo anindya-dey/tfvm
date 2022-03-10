@@ -1,9 +1,9 @@
-import cheerio from "cheerio";
-import got from "got";
-import inquirer from "inquirer";
+const cheerio = require("cheerio");
+const got = require("got");
+const inquirer = require("inquirer");
 
-import { TERRAFORM_DOWNLOAD_URL, STORAGE_DIR } from "../config.js";
-import { printSuccess, printError, printInfo } from "../utils/index.js";
+const { TERRAFORM_DOWNLOAD_URL, STORAGE_DIR } = require("../config.js");
+const { printSuccess, printError, printInfo } = require("../utils/index.js");
 
 function isTerraformLink(i, link) {
   // Return false if there is no href attribute.
@@ -14,7 +14,7 @@ function isTerraformLink(i, link) {
   return link.attribs.href.startsWith("/terraform/");
 }
 
-const list = async ({ remote }) => {
+const list = ({ remote }) => {
   if (remote) {
     got(TERRAFORM_DOWNLOAD_URL)
       .then((response) => {
@@ -53,7 +53,7 @@ const list = async ({ remote }) => {
         }
       });
   } else {
-    const fs = await import("fs");
+    const fs = require("fs");
     let terraformExecutables = [];
 
     if (fs.existsSync(STORAGE_DIR)) {
@@ -81,4 +81,4 @@ const list = async ({ remote }) => {
   }
 };
 
-export default list;
+module.exports = list;
