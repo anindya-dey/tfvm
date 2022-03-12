@@ -1,7 +1,7 @@
-const fs = require("fs");
+import fs from "fs";
 
-const { STORAGE_DIR } = require("../config.js");
-const { printSuccess, printError, printInfo } = require("../utils/index.js");
+import { STORAGE_DIR } from "../config.js";
+import { printSuccess, printError, printInfo } from "../utils/index.js";
 
 const dir = () => {
   if (fs.existsSync(STORAGE_DIR)) {
@@ -18,4 +18,4 @@ const dir = () => {
   }
 };
 
-module.exports = dir;
+export default dir;

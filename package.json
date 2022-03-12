@@ -2,8 +2,14 @@
   "name": "tfvm",
   "version": "0.2.15",
   "description": "Terraform Version Manager",
-  "author": "Anindya Dey",
-  "repository": "https://github.com/andys-github/tfvm.git",
+  "author": {
+    "name": "Anindya Dey",
+    "url": "https://anindyadey.com"
+  },
+  "repository": {
+    "type": "git",
+    "directory": "https://github.com/andys-github/tfvm.git"
+  },
   "bugs": {
     "url": "https://github.com/andys-github/tfvm/issues"
   },
@@ -11,6 +17,7 @@
   "bin": {
     "tfvm": "index.js"
   },
+  "type": "module",
   "badges": [
     {
       "description": "version",
@@ -35,12 +42,18 @@
     "commander": "^8.3.0",
     "got": "^11.8.3",
     "inquirer": "^8.2.0",
+    "ora": "^6.1.0",
     "rc": "^1.2.8",
     "update-notifier": "^5.1.0"
   },
   "keywords": [
+    "cli",
+    "tfvm",
     "terraform",
     "terraform-manager",
-    "terraform-version-manager"
+    "terraform-version-manager",
+    "agent-andy",
+    "andys-github",
+    "anindya"
   ]
 }

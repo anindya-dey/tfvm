@@ -1,9 +1,9 @@
-const cheerio = require("cheerio");
-const got = require("got");
-const inquirer = require("inquirer");
+import cheerio from "cheerio";
+import got from "got";
+import inquirer from "inquirer";
 
-const { TERRAFORM_DOWNLOAD_URL, STORAGE_DIR } = require("../config.js");
-const { printSuccess, printError, printInfo } = require("../utils/index.js");
+import { TERRAFORM_DOWNLOAD_URL, STORAGE_DIR } from "../config.js";
+import { printSuccess, printError, printInfo } from "../utils/index.js";
 
 function isTerraformLink(i, link) {
   // Return false if there is no href attribute.
@@ -81,4 +81,4 @@ const list = ({ remote }) => {
   }
 };
 
-module.exports = list;
+export default list;
