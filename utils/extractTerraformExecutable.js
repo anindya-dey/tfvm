@@ -1,5 +1,5 @@
-const extractTerraformLink = (link) => {
-  return link?.attribs?.href; //?.replace(/^\/terraform\//, '').replace(/\/$/, '');
+const extractTerraformExecutable = (link) => {
+  return link.attribs.href.replace(/^\/terraform\//, '').replace(/\/$/, '');
 };
 
-module.exports = extractTerraformLink;
+module.exports = extractTerraformExecutable;

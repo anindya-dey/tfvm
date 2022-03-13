@@ -2,8 +2,8 @@ const cheerio = require("cheerio");
 const got = require("got");
 const inquirer = require("inquirer");
 
-const { TERRAFORM_DOWNLOAD_URL, STORAGE_DIR } = require("../config.js");
-const { printSuccess, printError, printInfo } = require("../utils/index.js");
+const { TERRAFORM_DOWNLOAD_URL, STORAGE_DIR } = require("../config");
+const { printSuccess, printError, printInfo } = require("../utils/index");
 
 function isTerraformLink(i, link) {
   // Return false if there is no href attribute.

@@ -19,7 +19,7 @@ Use this command to list the downloaded versions of terraform
 $ tfvm list # gets all the locally available terraform executables
 ```
 
-Append `--remote` or `-r` with `list` to get a list of all available releases from [Terraform](https://releases.hashicorp.com/terraform")
+Append `--remote` or `-r` with `list` to get a list of all available releases from [Terraform](https://releases.hashicorp.com/terraform)
 ```sh
 $ tfvm list --remote # displays the available releases from Terraform's website
 ```
