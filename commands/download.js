@@ -1,5 +1,6 @@
 const { fetchTerraformVersions, downloadTerraform } = require("../services");
 const { selectVersion, selectPackage } = require("../prompts");
+const { printError } = require("../utils");
 
 const download = async (version) => {
   if (version) {
@@ -8,7 +9,7 @@ const download = async (version) => {
         `https://releases.hashicorp.com/terraform/${selectedPackage}`,
         version
       );
-    });
+    }).catch(err => printError(err));
   } else {
     let terraformVersions = await fetchTerraformVersions();
 
