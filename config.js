@@ -9,5 +9,7 @@ const config = rc("tfvm", {
 });
 
 module.exports = {
-  ...config,
+  TERRAFORM_DOWNLOAD_URL: config.TERRAFORM_DOWNLOAD_URL,
+  HOME_DIR: config.HOME_DIR,
+  STORAGE_DIR: config.STORAGE_DIR,
 };

@@ -20,5 +20,5 @@ module.exports = {
   printSuccess,
   printError,
   printInfo,
-  printPlainText
+  printPlainText,
 };

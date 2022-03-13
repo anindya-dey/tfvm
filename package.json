@@ -53,5 +53,11 @@
     "agent-andy",
     "andys-github",
     "anindya"
-  ]
+  ],
+  "devDependencies": {
+    "prettier": "^2.5.1"
+  },
+  "scripts": {
+    "lint": "prettier --write ."
+  }
 }
