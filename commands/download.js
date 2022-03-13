@@ -4,12 +4,14 @@ const { printError } = require("../utils");
 
 const download = async (version) => {
   if (version) {
-    await selectPackage(version).then(async ({ selectedPackage }) => {
-      await downloadTerraform(
-        `https://releases.hashicorp.com/terraform/${selectedPackage}`,
-        version
-      );
-    }).catch(err => printError(err));
+    await selectPackage(version)
+      .then(async ({ selectedPackage }) => {
+        await downloadTerraform(
+          `https://releases.hashicorp.com/terraform/${selectedPackage}`,
+          version
+        );
+      })
+      .catch((err) => printError(err));
   } else {
     let terraformVersions = await fetchTerraformVersions();
 
@@ -22,7 +24,7 @@ const download = async (version) => {
               selectedVersion
             );
           }
-        );
+        ).catch((err) => printError(err));;
       });
     }
   }

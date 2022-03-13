@@ -17,9 +17,11 @@ const downloadTerraform = async (downloadUrl, version) => {
     .then(() => {
       printSuccess("Download successful!");
     })
-    .catch((err) =>
-      printError("Download failed. Here is the error in details: ", err)
-    );
+    .catch((err) => {
+      throw new Erro(
+        "Download failed. Check your internet connectivity or try again later!"
+      );
+    });
 };
 
 module.exports = downloadTerraform;

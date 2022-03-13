@@ -21,13 +21,16 @@ const fetchTerraformVersions = async () => {
     })
     .catch((err) => {
       if (err.code === "ENOTFOUND") {
-        printError(
+        throw new Error(
           `Could not connect to ${TERRAFORM_DOWNLOAD_URL}. Check your internet connection!`
         );
+      } else if (err.code === "ERR_NON_2XX_3XX_RESPONSE") {
+        throw new Error(
+          `Could not download version "${version}". Check if the version is correct, or you have permission to download it!`
+        );
       } else {
-        printError(err);
+        throw new Error(err);
       }
-      return [];
     });
 };
 

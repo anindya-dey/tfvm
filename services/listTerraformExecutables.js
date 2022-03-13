@@ -2,7 +2,11 @@ const cheerio = require("cheerio");
 const got = require("got");
 
 const { TERRAFORM_DOWNLOAD_URL } = require("../config.js");
-const { printError, isTerraformLink, extractTerraformExecutable } = require("../utils");
+const {
+  printError,
+  isTerraformLink,
+  extractTerraformExecutable,
+} = require("../utils");
 
 const listTerraformExecutables = async (version) => {
   return got(`${TERRAFORM_DOWNLOAD_URL}/${version}/`)
@@ -21,9 +25,13 @@ const listTerraformExecutables = async (version) => {
     })
     .catch((err) => {
       if (err.code === "ENOTFOUND") {
-        throw new Error(`Could not connect to ${TERRAFORM_DOWNLOAD_URL}. Check your internet connection!`);
+        throw new Error(
+          `Could not connect to ${TERRAFORM_DOWNLOAD_URL}. Check your internet connection!`
+        );
       } else if (err.code === "ERR_NON_2XX_3XX_RESPONSE") {
-        throw new Error(`Could not download version "${version}". Check if the version is correct, or you have permission to download it!`);
+        throw new Error(
+          `Could not download version "${version}". Check if the version is correct, or you have permission to download it!`
+        );
       } else {
         throw new Error(err);
       }
