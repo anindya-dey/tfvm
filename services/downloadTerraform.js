@@ -1,5 +1,5 @@
 const fs = require("fs");
-const path = require('path');
+const path = require("path");
 const download = require("download");
 
 const { STORAGE_DIR } = require("../config");
