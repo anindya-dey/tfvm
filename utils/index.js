@@ -1,4 +1,9 @@
-const { printError, printInfo, printSuccess } = require("./print.js");
+const {
+  printError,
+  printInfo,
+  printSuccess,
+  printPlainText,
+} = require("./print.js");
 const isTerraformLink = require("./isTerraformLink.js");
 const extractTerraformLink = require("./extractTerraformLink.js");
 const listTerraformExecutables = require("./listTerraformExecutables.js");
@@ -12,4 +17,5 @@ module.exports = {
   extractTerraformLink,
   listTerraformExecutables,
   extractTerraformExecutable,
+  printPlainText,
 };
