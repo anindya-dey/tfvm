@@ -1,6 +1,6 @@
-import os from "os";
-import path from "path";
-import rc from "rc";
+const os = require("os");
+const path = require("path");
+const rc = require("rc");
 
 const config = rc("tfvm", {
   TERRAFORM_DOWNLOAD_URL: "https://releases.hashicorp.com/terraform",
@@ -8,6 +8,6 @@ const config = rc("tfvm", {
   STORAGE_DIR: path.join(os.homedir(), "tfvm"),
 });
 
-export const TERRAFORM_DOWNLOAD_URL = config.TERRAFORM_DOWNLOAD_URL;
-export const HOME_DIR = config.HOME_DIR;
-export const STORAGE_DIR = config.STORAGE_DIR;
+module.exports = {
+  ...config,
+};

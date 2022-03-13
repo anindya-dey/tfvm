@@ -1,9 +1,9 @@
-import * as cheerio from "cheerio";
-import got from "got";
+const cheerio = require("cheerio");
+const got = require("got");
 
-import { TERRAFORM_DOWNLOAD_URL } from "../config.js";
-import isTerraformLink from "./isTerraformLink.js";
-import extractTerraformExecutable from "./extractTerraformExecutable.js";
+const { TERRAFORM_DOWNLOAD_URL } = require("../config.js");
+const isTerraformLink = require("./isTerraformLink.js");
+const extractTerraformExecutable = require("./extractTerraformExecutable.js");
 
 const listTerraformExecutables = async (version) => {
   const terraformExecutables = [];
@@ -22,4 +22,4 @@ const listTerraformExecutables = async (version) => {
   return terraformExecutables;
 };
 
-export default listTerraformExecutables;
+module.exports = listTerraformExecutables;

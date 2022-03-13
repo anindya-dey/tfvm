@@ -1,20 +1,16 @@
 #! /usr/bin/env node
-import { program } from "commander";
-// import updateNotifier from "update-notifier";
-import ora from "ora";
 
-import list from "./commands/list.js";
-import download from "./commands/download.js";
-import dir from "./commands/dir.js";
-import {
-  TERRAFORM_DOWNLOAD_URL,
-  STORAGE_DIR,
-  HOME_DIR,
-} from "./config.js";
+const { program } = require("commander");
+const updateNotifier = require("update-notifier");
 
-// // Notify user about any updates
-// import pkg from "./package.json";
-// updateNotifier({ pkg }).notify();
+const list = require("./commands/list");
+const download = require("./commands/download.js");
+const dir = require("./commands/dir.js");
+const { TERRAFORM_DOWNLOAD_URL, HOME_DIR } = require("./config.js");
+
+// // // Notify user about any updates
+const pkg = require("./package.json");
+updateNotifier({ pkg }).notify();
 
 program.name("tfvm");
 
@@ -46,10 +42,3 @@ program
 program.showSuggestionAfterError();
 
 program.parse();
-
-const spinner = ora('Loading unicorns').start();
-
-setTimeout(() => {
-	spinner.color = 'yellow';
-	spinner.text = 'Loading rainbows';
-}, 1000);

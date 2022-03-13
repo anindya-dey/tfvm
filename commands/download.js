@@ -1,18 +1,19 @@
-import cheerio from "cheerio";
-import got from "got";
-import inquirer from "inquirer";
+const cheerio = require("cheerio");
+const got = require("got");
+const inquirer = require("inquirer");
 
-import { TERRAFORM_DOWNLOAD_URL, STORAGE_DIR } from "../config.js";
-import {
+const { TERRAFORM_DOWNLOAD_URL, STORAGE_DIR } = require("../config");
+const {
   printSuccess,
   printError,
   printInfo,
   isTerraformLink,
   extractTerraformLink,
   listTerraformExecutables,
-} from "../utils/index.js";
+} = require("../utils/index");
 
 const download = (version) => {
+  console.log('Version: ', version)
   let terraformExecutables = [];
 
   got(TERRAFORM_DOWNLOAD_URL)
@@ -67,4 +68,4 @@ const download = (version) => {
     });
 };
 
-export default download;
+module.exports = download;

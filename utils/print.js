@@ -1,13 +1,19 @@
-import chalk from "chalk";
+const chalk = require("chalk");
 
-export const printSuccess = (successMessage) => {
+const printSuccess = (successMessage) => {
   console.log(chalk.greenBright.bold(successMessage));
 };
 
-export const printError = (errorMessage) => {
+const printError = (errorMessage) => {
   console.log(chalk.redBright.bold(errorMessage));
 };
 
-export const printInfo = (infoMessage) => {
+const printInfo = (infoMessage) => {
   console.log(chalk.blueBright.bold(infoMessage));
+};
+
+module.exports = {
+  printSuccess,
+  printError,
+  printInfo,
 };
