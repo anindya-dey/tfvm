@@ -1,25 +1,19 @@
-import { red, blue, green } from "./render.js";
+const chalk = require("chalk");
 
-function printSuccess(successMessage) {
-    console.log(
-       green(successMessage)
-    )
-}
+const printSuccess = (successMessage) => {
+  console.log(chalk.greenBright.bold(successMessage));
+};
 
-function printError(errorMessage) {
-    console.log(
-        red(errorMessage)
-    )
-}
+const printError = (errorMessage) => {
+  console.log(chalk.redBright.bold(errorMessage));
+};
 
-function printInfo(infoMessage) {
-    console.log(
-        blue(infoMessage)
-    )
-}
+const printInfo = (infoMessage) => {
+  console.log(chalk.blueBright.bold(infoMessage));
+};
 
-export {
-    printSuccess,
-    printError,
-    printInfo
-}
+module.exports = {
+  printSuccess,
+  printError,
+  printInfo,
+};

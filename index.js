@@ -1,31 +1,16 @@
 #! /usr/bin/env node
 
-import { program } from "commander";
-import updateNotifier from "update-notifier";
-import boxen from "boxen";
+const { program } = require("commander");
+const updateNotifier = require("update-notifier");
 
-import list from "./commands/list.js";
-import download from "./commands/download.js";
-import dir from "./commands/dir.js";
+const list = require("./commands/list");
+const download = require("./commands/download.js");
+const dir = require("./commands/dir.js");
+const { TERRAFORM_DOWNLOAD_URL, HOME_DIR } = require("./config.js");
 
-import { TERRAFORM_DOWNLOAD_URL, STORAGE_DIR, HOME_DIR } from "./config.js";
-
-// Notify user about any updates
-// import pkg from './package.json';
-// updateNotifier({pkg}).notify();
-
-console.log(
-  boxen("Welcome to \nTerraform Version Manager \n\n v0.2.9", {
-    padding: 2,
-    margin: {
-      top: 2,
-      bottom: 2
-    },
-    title: "TFVM",
-    titleAlignment: "center",
-    textAlignment: "center",
-  })
-);
+// // // Notify user about any updates
+const pkg = require("./package.json");
+updateNotifier({ pkg }).notify();
 
 program.name("tfvm");
 
