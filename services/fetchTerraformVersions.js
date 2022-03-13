@@ -25,7 +25,7 @@ const fetchTerraformVersions = async () => {
           `Could not connect to ${TERRAFORM_DOWNLOAD_URL}. Check your internet connection!`
         );
       } else {
-        printError(err)
+        printError(err);
       }
       return [];
     });
