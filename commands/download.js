@@ -17,14 +17,14 @@ const download = async (version) => {
 
     if (terraformVersions.length > 0) {
       selectVersion(terraformVersions).then(async ({ selectedVersion }) => {
-        await selectPackage(selectedVersion).then(
-          async ({ selectedPackage }) => {
+        await selectPackage(selectedVersion)
+          .then(async ({ selectedPackage }) => {
             await downloadTerraform(
               `https://releases.hashicorp.com/terraform/${selectedPackage}`,
               selectedVersion
             );
-          }
-        ).catch((err) => printError(err));;
+          })
+          .catch((err) => printError(err));
       });
     }
   }
