@@ -1,12 +1,39 @@
 {
   "name": "tfvm",
-  "version": "0.2.8",
+  "version": "0.2.16",
   "description": "Terraform Version Manager",
+  "author": {
+    "name": "Anindya Dey",
+    "url": "https://anindyadey.com"
+  },
+  "repository": {
+    "type": "git",
+    "directory": "https://github.com/andys-github/tfvm.git"
+  },
+  "bugs": {
+    "url": "https://github.com/andys-github/tfvm/issues"
+  },
+  "preview": true,
   "bin": {
     "tfvm": "index.js"
   },
-  "repository": "https://github.com/andys-github/tfvm.git",
-  "author": "Anindya Dey",
+  "badges": [
+    {
+      "description": "version",
+      "url": "https://img.shields.io/npm/v/tfvm?color=blue&label=version&style=flat-square",
+      "href": "https://www.npmjs.com/package/tfvm"
+    },
+    {
+      "description": "download per week",
+      "url": "https://img.shields.io/npm/dw/tfvm",
+      "href": "https://www.npmjs.com/package/tfvm"
+    },
+    {
+      "description": "license",
+      "url": "https://img.shields.io/npm/l/tfvm?color=lightblue",
+      "href": "https://www.npmjs.com/package/tfvm"
+    }
+  ],
   "license": "MIT",
   "dependencies": {
     "chalk": "^4.1.2",
@@ -18,8 +45,13 @@
     "update-notifier": "^5.1.0"
   },
   "keywords": [
+    "cli",
+    "tfvm",
     "terraform",
     "terraform-manager",
-    "terraform-version-manager"
+    "terraform-version-manager",
+    "agent-andy",
+    "andys-github",
+    "anindya"
   ]
 }

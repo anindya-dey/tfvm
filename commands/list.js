@@ -1,82 +1,79 @@
-const cheerio = require('cheerio');
-const got = require('got');
-const inquirer = require('inquirer');
+const cheerio = require("cheerio");
+const got = require("got");
+const inquirer = require("inquirer");
 
+const { TERRAFORM_DOWNLOAD_URL, STORAGE_DIR } = require("../config");
 const {
-    TERRAFORM_DOWNLOAD_URL,
-    STORAGE_DIR
-} = require('../config');
-const getTerraformVersions = require('../utils/get-terraform-versions');
-
+  printSuccess,
+  printError,
+  printInfo,
+  isTerraformLink,
+} = require("../utils");
 const {
-    printSuccess,
-    printError,
-    printInfo,
-    print
-} = require('../utils/print');
+  listOfAvailableTerraformVersions,
+  checkInternetConnection,
+  listOfLocallyAvailableTerraformVersions,
+  noLocalTerraformVersionsAvailable,
+  configureNewStoragePath,
+} = require("../constants");
 
-const { blue } = require('../utils/render');
+const list = ({ remote }) => {
+  if (remote) {
+    got(TERRAFORM_DOWNLOAD_URL)
+      .then((response) => {
+        const $ = cheerio.load(response.body);
 
-function isTerraformLink(i, link) {
-    // Return false if there is no href attribute.
-    if (typeof link.attribs.href === 'undefined') { return false }
+        const terraformVersions = [];
 
-    return link.attribs.href.startsWith('/terraform/');
-}
+        $("a")
+          .filter(isTerraformLink)
+          .each((i, link) => {
+            const href = link.attribs.href
+              .replace(/^\/terraform\//, "")
+              .replace(/\/$/, "");
+            terraformVersions.push(href);
+          });
 
-function list({ remote }) {
-    if (remote) {
-        got(TERRAFORM_DOWNLOAD_URL)
-            .then(response => {
-                const $ = cheerio.load(response.body)
-
-                const terraformVersions = [];
-
-                $('a').filter(isTerraformLink).each((i, link) => {
-                    const href = link.attribs.href.replace(/^\/terraform\//, '').replace(/\/$/, '');
-                    terraformVersions.push(href)
-                });
-
-                inquirer
-                    .prompt([{
-                        type: 'list',
-                        name: 'terraformVersion',
-                        message: blue(`Here is a list of terraform versions available at ${TERRAFORM_DOWNLOAD_URL}. Select one to download:`),
-                        choices: terraformVersions,
-                        pageSize: 10,
-                    }]).then((answers) => {
-                        printSuccess(JSON.stringify(answers, null, 4))
-                    })
-            }).catch(err => {
-                if (err.code === 'ENOTFOUND') {
-                    printError(`Could not connect to ${TERRAFORM_DOWNLOAD_URL}. Check your internet connection!`)
-                }
-            })
-    } else {
-        const fs = require('fs');
-        let terraformExecutables = []
-
-        if (fs.existsSync(STORAGE_DIR)) {
-            terraformExecutables = fs.readdirSync(STORAGE_DIR)
+        inquirer
+          .prompt([
+            {
+              type: "list",
+              name: "terraformVersion",
+              message: listOfAvailableTerraformVersions,
+              choices: terraformVersions,
+              pageSize: 10,
+            },
+          ])
+          .then((answers) => {
+            printSuccess(JSON.stringify(answers, null, 4));
+          });
+      })
+      .catch((err) => {
+        if (err.code === "ENOTFOUND") {
+          printError(checkInternetConnection);
         }
+      });
+  } else {
+    const fs = require("fs");
+    let terraformExecutables = [];
 
-        if (terraformExecutables && terraformExecutables.length) {
-            //user has terraform executables
-            printInfo(`Here is a list of terraform executables present at ${STORAGE_DIR}:\n`)
-
-            terraformExecutables.forEach((terraform, index) => {
-                printSuccess(`\t${terraform}`)
-            })
-
-            print('\n')
-        } else {
-            //user does not have any terraform executables
-            printError(`You don\'t have any terraform executables at ${STORAGE_DIR}.`)
-            printInfo(`To configure an existing path or to set a new path, use tfvm dir -p <path/to/store/terraform/executables>\n`)
-        }
-
-        getTerraformVersions().then(terraformVersions => console.log(terraformVersions))
+    if (fs.existsSync(STORAGE_DIR)) {
+      terraformExecutables = fs.readdirSync(STORAGE_DIR);
     }
-}
 
-module.exports = list
+    if (terraformExecutables && terraformExecutables.length) {
+      //user has terraform executables
+      printInfo(listOfLocallyAvailableTerraformVersions);
+
+      terraformExecutables.forEach((terraform, index) => {
+        printSuccess(`  ${terraform}`);
+      });
+    } else {
+      //user does not have any terraform executables
+      printError(noLocalTerraformVersionsAvailable);
+      printInfo(configureNewStoragePath);
+    }
+  }
+};
+
+module.exports = list;
