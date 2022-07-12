@@ -26,7 +26,9 @@ const list = ({ remote }) => {
         const terraformVersions = [];
 
         $("a")
-          .filter(isTerraformLink)
+          .filter((_, a) => {
+            return isTerraformLink(a);
+          })
           .each((i, link) => {
             const href = link.attribs.href
               .replace(/^\/terraform\//, "")
