@@ -10,7 +10,13 @@ const { TERRAFORM_DOWNLOAD_URL, HOME_DIR } = require("./config.js");
 
 // > Notify user about any updates
 const pkg = require("./package.json");
-updateNotifier({ pkg }).notify();
+updateNotifier({
+  pkg,
+  updateCheckInterval: 1000,
+}).notify({
+  isGlobal: true,
+  defer: false,
+});
 
 program
   .name("tfvm")
