@@ -7,7 +7,8 @@ const download = async (version) => {
     await selectPackage(version)
       .then(async ({ selectedPackage }) => {
         await downloadTerraform(
-          `https://releases.hashicorp.com/terraform/${selectedPackage}`,
+          //`https://releases.hashicorp.com/terraform/${selectedPackage}`,
+          selectedPackage,
           version
         );
       })
@@ -20,7 +21,8 @@ const download = async (version) => {
         await selectPackage(selectedVersion)
           .then(async ({ selectedPackage }) => {
             await downloadTerraform(
-              `https://releases.hashicorp.com/terraform/${selectedPackage}`,
+              //`https://releases.hashicorp.com/terraform/${selectedPackage}`,
+              selectedPackage,
               selectedVersion
             );
           })
