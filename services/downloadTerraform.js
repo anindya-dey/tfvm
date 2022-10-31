@@ -15,7 +15,7 @@ const downloadTerraform = async (downloadUrl, version) => {
   }
 
   await download(downloadUrl, `${STORAGE_DIR}`, {
-    extract: true
+    extract: true,
   })
     .then(() => {
       printSuccess("Download successful!");

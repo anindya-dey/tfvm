@@ -59,6 +59,7 @@
     "prettier": "^2.5.1"
   },
   "scripts": {
-    "lint": "prettier --write ."
+    "lint": "prettier --write .",
+    "test": "echo 'Tests to be added"
   }
 }
