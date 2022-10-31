@@ -60,6 +60,6 @@
   },
   "scripts": {
     "lint": "prettier --write .",
-    "test": "echo 'Tests to be added"
+    "test": "echo 'Tests to be added'"
   }
 }
