@@ -6,7 +6,7 @@ const {
   printError,
   isTerraformLink,
   extractTerraformExecutable,
-  isTerraformPackage
+  isTerraformPackage,
 } = require("../utils");
 
 const listTerraformExecutables = async (version) => {
@@ -18,9 +18,9 @@ const listTerraformExecutables = async (version) => {
       $("a")
         .filter((_, link) => isTerraformLink(link))
         .each((i, link) => {
-          if(isTerraformPackage(link)) {
-              const href = extractTerraformExecutable(link);
-              terraformExecutables.push(href);
+          if (isTerraformPackage(link)) {
+            const href = extractTerraformExecutable(link);
+            terraformExecutables.push(href);
           }
         });
 

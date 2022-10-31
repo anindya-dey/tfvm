@@ -8,10 +8,10 @@
   },
   "repository": {
     "type": "git",
-    "directory": "https://github.com/andys-github/tfvm.git"
+    "directory": "https://github.com/anindya-dey/tfvm.git"
   },
   "bugs": {
-    "url": "https://github.com/andys-github/tfvm/issues"
+    "url": "https://github.com/anindya-dey/tfvm/issues"
   },
   "preview": true,
   "bin": {
@@ -52,13 +52,14 @@
     "terraform-manager",
     "terraform-version-manager",
     "agent-andy",
-    "andys-github",
+    "anindya-dey",
     "anindya"
   ],
   "devDependencies": {
     "prettier": "^2.5.1"
   },
   "scripts": {
-    "lint": "prettier --write ."
+    "lint": "prettier --write .",
+    "test": "echo 'Tests to be added'"
   }
 }
