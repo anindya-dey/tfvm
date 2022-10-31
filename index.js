@@ -12,10 +12,10 @@ const { TERRAFORM_DOWNLOAD_URL, HOME_DIR } = require("./config.js");
 const pkg = require("./package.json");
 updateNotifier({
   pkg,
-  updateCheckInterval: 1000
+  updateCheckInterval: 1000,
 }).notify({
   isGlobal: true,
-  defer: false
+  defer: false,
 });
 
 program

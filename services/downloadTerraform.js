@@ -15,15 +15,15 @@ const downloadTerraform = async (downloadUrl, version) => {
 
   await download(downloadUrl, `${STORAGE_DIR}`, {
     extract: true,
-    map: file => {
+    map: (file) => {
       const fileNameWithoutExtension = path.basename(downloadUrl, ".zip");
-      if(file.path == "terraform") {
+      if (file.path == "terraform") {
         file.path = fileNameWithoutExtension;
-      } else if(file.path = "terraform.exe") {
+      } else if ((file.path = "terraform.exe")) {
         file.path = `${fileNameWithoutExtension}.exe`;
       }
       return file;
-    }
+    },
   })
     .then(() => {
       printSuccess("Download successful!");

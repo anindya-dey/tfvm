@@ -6,10 +6,7 @@ const download = async (version) => {
   if (version) {
     await selectPackage(version)
       .then(async ({ selectedPackage }) => {
-        await downloadTerraform(
-          selectedPackage,
-          version
-        );
+        await downloadTerraform(selectedPackage, version);
       })
       .catch((err) => printError(err));
   } else {
@@ -19,10 +16,7 @@ const download = async (version) => {
       selectVersion(terraformVersions).then(async ({ selectedVersion }) => {
         await selectPackage(selectedVersion)
           .then(async ({ selectedPackage }) => {
-            await downloadTerraform(
-              selectedPackage,
-              selectedVersion
-            );
+            await downloadTerraform(selectedPackage, selectedVersion);
           })
           .catch((err) => printError(err));
       });
