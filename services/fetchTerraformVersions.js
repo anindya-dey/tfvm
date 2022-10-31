@@ -1,8 +1,7 @@
 const got = require("got");
 const cheerio = require("cheerio");
 
-const { TERRAFORM_DOWNLOAD_URL } = require("../config");
-const { printError } = require("../utils/print");
+const { TERRAFORM_DOWNLOAD_URL } = require("../configs");
 const { isTerraformLink, extractTerraformLink } = require("../utils");
 
 const fetchTerraformVersions = async () => {

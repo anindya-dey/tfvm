@@ -2,7 +2,7 @@ const cheerio = require("cheerio");
 const got = require("got");
 const inquirer = require("inquirer");
 
-const { TERRAFORM_DOWNLOAD_URL, STORAGE_DIR } = require("../config");
+const { TERRAFORM_DOWNLOAD_URL, STORAGE_DIR } = require("../configs");
 const {
   printSuccess,
   printError,
@@ -17,8 +17,8 @@ const {
   configureNewStoragePath,
 } = require("../constants");
 
-const list = ({ remote }) => {
-  if (remote) {
+const list = ({ available }) => {
+  if (available) {
     got(TERRAFORM_DOWNLOAD_URL)
       .then((response) => {
         const $ = cheerio.load(response.body);
@@ -45,6 +45,12 @@ const list = ({ remote }) => {
               choices: terraformVersions,
               pageSize: 10,
             },
+            {
+              type: "confirm",
+              name: "wantToDownload",
+              message: "Do you want to download this version?",
+              default: false
+            }
           ])
           .then((answers) => {
             printSuccess(JSON.stringify(answers, null, 4));

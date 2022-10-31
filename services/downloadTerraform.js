@@ -2,8 +2,8 @@ const fs = require("fs");
 const path = require("path");
 const download = require("download");
 
-const { STORAGE_DIR } = require("../config");
-const { printInfo, printSuccess, printError } = require("../utils");
+const { STORAGE_DIR } = require("../configs");
+const { printInfo, printSuccess } = require("../utils");
 
 const downloadTerraform = async (downloadUrl, version) => {
   printInfo(`Downloading terraform version "${version}"`);

@@ -1,9 +1,8 @@
 const cheerio = require("cheerio");
 const got = require("got");
 
-const { TERRAFORM_DOWNLOAD_URL } = require("../config.js");
+const { TERRAFORM_DOWNLOAD_URL } = require("../configs");
 const {
-  printError,
   isTerraformLink,
   extractTerraformExecutable,
   isTerraformPackage,

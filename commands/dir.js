@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-const { STORAGE_DIR } = require("../config.js");
+const { STORAGE_DIR } = require("../configs/index.js");
 const { printSuccess, printError, printInfo } = require("../utils/index.js");
 
 const dir = () => {

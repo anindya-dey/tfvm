@@ -6,7 +6,7 @@ const updateNotifier = require("update-notifier");
 const list = require("./commands/list");
 const download = require("./commands/download.js");
 const dir = require("./commands/dir.js");
-const { TERRAFORM_DOWNLOAD_URL, HOME_DIR } = require("./config.js");
+const { TERRAFORM_DOWNLOAD_URL, HOME_DIR } = require("./configs");
 
 // > Notify user about any updates
 const pkg = require("./package.json");
@@ -20,7 +20,7 @@ updateNotifier({
 
 program
   .name("tfvm")
-  .description("A CLI tool to manage Terraform versions")
+  .description("Terraform Version Manager - A CLI tool to manage Terraform versions")
   .version(pkg.version);
 
 program
@@ -28,8 +28,8 @@ program
   .alias("ls")
   .description("List all the downloaded versions of terraform")
   .option(
-    "-r, --remote",
-    `Displays a list of terraform versions available at ${TERRAFORM_DOWNLOAD_URL}`
+    "-a, --available",
+    `Displays a list of all terraform versions available at ${TERRAFORM_DOWNLOAD_URL}`
   )
   .action(list);
 
@@ -37,9 +37,9 @@ program
   .command("download")
   .alias("d")
   .description(
-    "Downloads the latest version, or a specific version of terraform"
+    "Downloads a specific version of terraform"
   )
-  .argument("[version]", "Version of Terraform you want to download")
+  .argument("[version]", "If provided, this version of Terraform would be downloaded. If not, user would see a list of available versions to choose from.")
   .action(download);
 
 program
