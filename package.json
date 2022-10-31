@@ -59,7 +59,7 @@
     "prettier": "^2.5.1"
   },
   "scripts": {
-    "lint": "prettier --write .",
+    "lint": "prettier --end-of-line crlf --write .",
     "test": "echo 'Tests to be added'"
   }
 }
