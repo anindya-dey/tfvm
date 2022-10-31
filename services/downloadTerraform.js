@@ -6,7 +6,6 @@ const { STORAGE_DIR } = require("../config");
 const { printInfo, printSuccess, printError } = require("../utils");
 
 const downloadTerraform = async (downloadUrl, version) => {
-  printInfo(path.basename(downloadUrl));
   printInfo(`Downloading terraform version "${version}"`);
 
   if (!fs.existsSync(STORAGE_DIR)) {
@@ -16,6 +15,15 @@ const downloadTerraform = async (downloadUrl, version) => {
 
   await download(downloadUrl, `${STORAGE_DIR}`, {
     extract: true,
+    map: file => {
+      const fileNameWithoutExtension = path.basename(downloadUrl, ".zip");
+      if(file.path == "terraform") {
+        file.path = fileNameWithoutExtension;
+      } else if(file.path = "terraform.exe") {
+        file.path = `${fileNameWithoutExtension}.exe`;
+      }
+      return file;
+    }
   })
     .then(() => {
       printSuccess("Download successful!");

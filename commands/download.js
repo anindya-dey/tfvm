@@ -6,9 +6,7 @@ const download = async (version) => {
   if (version) {
     await selectPackage(version)
       .then(async ({ selectedPackage }) => {
-        console.log(`selected package: ${selectedPackage}`);
         await downloadTerraform(
-          //`https://releases.hashicorp.com/terraform/${selectedPackage}`,
           selectedPackage,
           version
         );
@@ -22,7 +20,6 @@ const download = async (version) => {
         await selectPackage(selectedVersion)
           .then(async ({ selectedPackage }) => {
             await downloadTerraform(
-              //`https://releases.hashicorp.com/terraform/${selectedPackage}`,
               selectedPackage,
               selectedVersion
             );
