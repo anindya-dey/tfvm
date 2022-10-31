@@ -49,8 +49,8 @@ const list = ({ available }) => {
               type: "confirm",
               name: "wantToDownload",
               message: "Do you want to download this version?",
-              default: false
-            }
+              default: false,
+            },
           ])
           .then((answers) => {
             printSuccess(JSON.stringify(answers, null, 4));

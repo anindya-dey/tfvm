@@ -20,7 +20,9 @@ updateNotifier({
 
 program
   .name("tfvm")
-  .description("Terraform Version Manager - A CLI tool to manage Terraform versions")
+  .description(
+    "Terraform Version Manager - A CLI tool to manage Terraform versions"
+  )
   .version(pkg.version);
 
 program
@@ -36,10 +38,11 @@ program
 program
   .command("download")
   .alias("d")
-  .description(
-    "Downloads a specific version of terraform"
+  .description("Downloads a specific version of terraform")
+  .argument(
+    "[version]",
+    "If provided, this version of Terraform would be downloaded. If not, user would see a list of available versions to choose from."
   )
-  .argument("[version]", "If provided, this version of Terraform would be downloaded. If not, user would see a list of available versions to choose from.")
   .action(download);
 
 program
