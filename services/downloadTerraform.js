@@ -10,15 +10,18 @@ const downloadTerraform = async (downloadUrl, version) => {
   printInfo(`Downloading terraform version "${version}"`);
 
   if (!fs.existsSync(STORAGE_DIR)) {
+    console.log(`Creating storage dir ${STORAGE_DIR}`);
     fs.mkdirSync(STORAGE_DIR);
   }
 
-  await download(downloadUrl, `${STORAGE_DIR}`)
+  await download(downloadUrl, `${STORAGE_DIR}`, {
+    extract: true
+  })
     .then(() => {
       printSuccess("Download successful!");
     })
     .catch((err) => {
-      throw new Erro(
+      throw new Error(
         "Download failed. Check your internet connectivity or try again later!"
       );
     });

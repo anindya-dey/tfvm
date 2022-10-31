@@ -7,6 +7,7 @@ const {
 const isTerraformLink = require("./isTerraformLink");
 const extractTerraformLink = require("./extractTerraformLink");
 const extractTerraformExecutable = require("./extractTerraformExecutable");
+const isTerraformPackage = require("./isTerraformPackage");
 
 module.exports = {
   printError,
@@ -16,4 +17,5 @@ module.exports = {
   extractTerraformLink,
   extractTerraformExecutable,
   printPlainText,
+  isTerraformPackage,
 };
