@@ -15,7 +15,7 @@ jobs:
       - run: npm ci
       - run: npm test
 
-  build:
+  publish-to-npm:
     needs: run-tests
     runs-on: ubuntu-latest
     steps:
@@ -23,18 +23,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+          registry-url: https://registry.npmjs.org/
       - run: npm ci
       - run: npm run build
-
-  publish-to-npm:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          registry-url: https://registry.npmjs.org/
       - run: cd dist
       - run: npm publish
         env:
