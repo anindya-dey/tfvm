@@ -1,6 +1,6 @@
-const inquirer = require("inquirer");
+import inquirer from "inquirer";
 
-const { listTerraformExecutables } = require("../services");
+import { listTerraformExecutables } from "../services";
 
 const selectPackage = async (version) => {
   return inquirer.prompt([
@@ -14,4 +14,4 @@ const selectPackage = async (version) => {
   ]);
 };
 
-module.exports = selectPackage;
+export default selectPackage;

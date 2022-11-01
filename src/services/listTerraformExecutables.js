@@ -1,12 +1,12 @@
-const cheerio = require("cheerio");
-const got = require("got");
+import cheerio from "cheerio";
+import got from "got";
 
-const { TERRAFORM_DOWNLOAD_URL } = require("../configs");
-const {
+import { TERRAFORM_DOWNLOAD_URL } from "../configs";
+import {
   isTerraformLink,
   extractTerraformExecutable,
   isTerraformPackage,
-} = require("../utils");
+} from "../utils";
 
 const listTerraformExecutables = async (version) => {
   return got(`${TERRAFORM_DOWNLOAD_URL}/${version}/`)

@@ -6,4 +6,4 @@ const isTerraformLink = (link) => {
   return link.attribs.href.includes("/terraform/");
 };
 
-module.exports = isTerraformLink;
+export default isTerraformLink;

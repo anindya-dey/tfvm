@@ -1,6 +1,6 @@
-const { fetchTerraformVersions, downloadTerraform } = require("../services");
-const { selectVersion, selectPackage } = require("../prompts");
-const { printError } = require("../utils");
+import { fetchTerraformVersions, downloadTerraform } from "../services";
+import { selectVersion, selectPackage } from "../prompts";
+import { printError } from "../utils";
 
 const download = async (version) => {
   if (version) {
@@ -24,4 +24,4 @@ const download = async (version) => {
   }
 };
 
-module.exports = download;
+export default download;

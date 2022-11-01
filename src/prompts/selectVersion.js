@@ -1,4 +1,4 @@
-const inquirer = require("inquirer");
+import inquirer from "inquirer";
 
 const selectVersion = (terraformVersions) => {
   return inquirer.prompt([
@@ -12,4 +12,4 @@ const selectVersion = (terraformVersions) => {
   ]);
 };
 
-module.exports = selectVersion;
+export default selectVersion;

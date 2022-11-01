@@ -1,7 +1,7 @@
-const selectVersion = require("./selectVersion");
-const selectPackage = require("./selectPackage");
+import selectVersion from "./selectVersion";
+import selectPackage from "./selectPackage";
 
-module.exports = {
+export default {
   selectVersion,
   selectPackage,
 };

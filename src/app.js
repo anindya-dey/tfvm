@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 import { program } from "commander";
-import updateNotifier from "update-notifier";
+// import updateNotifier from "update-notifier";
 
 import list from "./commands/list";
 import download from "./commands/download.js";
@@ -9,14 +9,14 @@ import dir from "./commands/dir.js";
 import { TERRAFORM_DOWNLOAD_URL, HOME_DIR } from "./configs";
 
 // > Notify user about any updates
-import pkg from "./package.json";
-updateNotifier({
-  pkg,
-  updateCheckInterval: 1000,
-}).notify({
-  isGlobal: true,
-  defer: false,
-});
+import pkg from "../package.json";
+// updateNotifier({
+//   pkg,
+//   updateCheckInterval: 1000,
+// }).notify({
+//   isGlobal: true,
+//   defer: false,
+// });
 
 program
   .name("tfvm")

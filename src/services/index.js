@@ -1,8 +1,8 @@
-const fetchTerraformVersions = require("./fetchTerraformVersions");
-const listTerraformExecutables = require("./listTerraformExecutables");
-const downloadTerraform = require("./downloadTerraform");
+import fetchTerraformVersions from "./fetchTerraformVersions";
+import listTerraformExecutables from "./listTerraformExecutables";
+import downloadTerraform from "./downloadTerraform";
 
-module.exports = {
+export default {
   fetchTerraformVersions,
   listTerraformExecutables,
   downloadTerraform,

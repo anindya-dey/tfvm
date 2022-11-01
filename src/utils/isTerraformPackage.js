@@ -6,4 +6,4 @@ const isTerraformPackage = (link) => {
   return link.attribs.href.endsWith(".zip");
 };
 
-module.exports = isTerraformPackage;
+export default isTerraformPackage;

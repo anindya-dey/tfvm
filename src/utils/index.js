@@ -1,13 +1,13 @@
-const {
+import {
   printError,
   printInfo,
   printSuccess,
   printPlainText,
-} = require("./print");
-const isTerraformLink = require("./isTerraformLink");
-const extractTerraformLink = require("./extractTerraformLink");
-const extractTerraformExecutable = require("./extractTerraformExecutable");
-const isTerraformPackage = require("./isTerraformPackage");
+} from "./print";
+import isTerraformLink from "./isTerraformLink";
+import extractTerraformLink from "./extractTerraformLink";
+import extractTerraformExecutable from "./extractTerraformExecutable";
+import isTerraformPackage from "./isTerraformPackage";
 
 module.exports = {
   printError,

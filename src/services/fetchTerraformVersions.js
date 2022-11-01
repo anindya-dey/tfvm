@@ -1,8 +1,8 @@
-const got = require("got");
-const cheerio = require("cheerio");
+import got from "got";
+import cheerio from "cheerio";
 
-const { TERRAFORM_DOWNLOAD_URL } = require("../configs");
-const { isTerraformLink, extractTerraformLink } = require("../utils");
+import { TERRAFORM_DOWNLOAD_URL } from "../configs";
+import { isTerraformLink, extractTerraformLink } from "../utils";
 
 const fetchTerraformVersions = async () => {
   return got(TERRAFORM_DOWNLOAD_URL)
@@ -33,4 +33,4 @@ const fetchTerraformVersions = async () => {
     });
 };
 
-module.exports = fetchTerraformVersions;
+export default fetchTerraformVersions;

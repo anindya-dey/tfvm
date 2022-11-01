@@ -1,9 +1,9 @@
-const fs = require("fs");
-const path = require("path");
-const download = require("download");
+import fs from "fs";
+import path from "path";
+import download from "download";
 
-const { STORAGE_DIR } = require("../configs");
-const { printInfo, printSuccess } = require("../utils");
+import { STORAGE_DIR } from "../configs";
+import { printInfo, printSuccess } from "../utils";
 
 const downloadTerraform = async (downloadUrl, version) => {
   printInfo(`Downloading terraform version "${version}"`);
@@ -35,4 +35,4 @@ const downloadTerraform = async (downloadUrl, version) => {
     });
 };
 
-module.exports = downloadTerraform;
+export default downloadTerraform;

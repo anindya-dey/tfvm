@@ -1,19 +1,10 @@
-const cheerio = require("cheerio");
-const got = require("got");
+import cheerio from "cheerio";
+import got from "got";
 
-const { TERRAFORM_DOWNLOAD_URL } = require("../config");
-const { printError } = require("../utils/print");
+import { TERRAFORM_DOWNLOAD_URL } from "../config";
+import { isTerraformLink, printError } from "../utils/print";
 
-function isTerraformLink(i, link) {
-  // Return false if there is no href attribute.
-  if (typeof link.attribs.href === "undefined") {
-    return false;
-  }
-
-  return link.attribs.href.startsWith("/terraform/");
-}
-
-function getTerraformVersions() {
+const getTerraformVersions = () => {
   const terraformVersions = [];
 
   return got(TERRAFORM_DOWNLOAD_URL)
@@ -21,8 +12,8 @@ function getTerraformVersions() {
       const $ = cheerio.load(response.body);
 
       $("a")
-        .filter(isTerraformLink)
-        .each((i, link) => {
+        .filter((_, link) => isTerraformLink(link))
+        .each((_, link) => {
           const href = link.attribs.href
             .replace(/^\/terraform\//, "")
             .replace(/\/$/, "");
@@ -42,4 +33,4 @@ function getTerraformVersions() {
     });
 }
 
-module.exports = getTerraformVersions;
+export default getTerraformVersions;

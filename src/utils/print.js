@@ -1,4 +1,4 @@
-const chalk = require("chalk");
+import chalk from "chalk";
 
 const printSuccess = (successMessage) => {
   console.log(chalk.greenBright(successMessage));
@@ -16,7 +16,7 @@ const printPlainText = (text) => {
   console.log(chalk.white(text));
 };
 
-module.exports = {
+export default {
   printSuccess,
   printError,
   printInfo,

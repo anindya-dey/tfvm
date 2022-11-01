@@ -1,21 +1,22 @@
-const cheerio = require("cheerio");
-const got = require("got");
-const inquirer = require("inquirer");
+import fs from "fs";
+import cheerio from "cheerio";
+import got from "got";
+import inquirer from "inquirer";
 
-const { TERRAFORM_DOWNLOAD_URL, STORAGE_DIR } = require("../configs");
-const {
+import { TERRAFORM_DOWNLOAD_URL, STORAGE_DIR } from "../configs";
+import {
   printSuccess,
   printError,
   printInfo,
   isTerraformLink,
-} = require("../utils");
-const {
+} from "../utils";
+import {
   listOfAvailableTerraformVersions,
   checkInternetConnection,
   listOfLocallyAvailableTerraformVersions,
   noLocalTerraformVersionsAvailable,
   configureNewStoragePath,
-} = require("../constants");
+} from "../constants";
 
 const list = ({ available }) => {
   if (available) {
@@ -62,7 +63,6 @@ const list = ({ available }) => {
         }
       });
   } else {
-    const fs = require("fs");
     let terraformExecutables = [];
 
     if (fs.existsSync(STORAGE_DIR)) {
@@ -84,4 +84,4 @@ const list = ({ available }) => {
   }
 };
 
-module.exports = list;
+export default list;

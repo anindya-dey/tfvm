@@ -1,10 +1,10 @@
-const {
+import {
   listOfAvailableTerraformVersions,
   checkInternetConnection,
   listOfLocallyAvailableTerraformVersions,
   noLocalTerraformVersionsAvailable,
   configureNewStoragePath,
-} = require("./list-messages");
+} from "./list-messages";
 
 module.exports = {
   listOfAvailableTerraformVersions,
