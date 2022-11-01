@@ -1,26 +1,23 @@
-import cheerio from "cheerio";
+import { load } from "cheerio";
 import got from "got";
 
-import { TERRAFORM_DOWNLOAD_URL } from "../configs";
-import {
-  isTerraformLink,
-  extractTerraformExecutable,
-  isTerraformPackage,
-} from "../utils";
+import { TERRAFORM_RELEASE_REPO } from "../configs";
+import { isTerraformLink, isZipPackage } from "../utils";
 
 const listTerraformExecutables = async (version: string) => {
-  return got(`${TERRAFORM_DOWNLOAD_URL}/${version}/`)
+  return got(`${TERRAFORM_RELEASE_REPO}/${version}/`)
     .then((response) => {
       const terraformExecutables: string[] = [];
-      const $ = cheerio.load(response.body);
+      const $ = load(response.body);
 
       $("a")
-        .filter((_, link) => isTerraformLink(link))
+        .filter(
+          (_, link) =>
+            isTerraformLink(link.attribs?.href) &&
+            isZipPackage(link.attribs?.href)
+        )
         .each((i, link) => {
-          if (isTerraformPackage(link)) {
-            const href = extractTerraformExecutable(link);
-            terraformExecutables.push(href);
-          }
+          terraformExecutables.push(link.attribs?.href);
         });
 
       return terraformExecutables;
@@ -28,7 +25,7 @@ const listTerraformExecutables = async (version: string) => {
     .catch((err) => {
       if (err.code === "ENOTFOUND") {
         throw new Error(
-          `Could not connect to ${TERRAFORM_DOWNLOAD_URL}. Check your internet connection!`
+          `Could not connect to ${TERRAFORM_RELEASE_REPO}. Check your internet connection!`
         );
       } else if (err.code === "ERR_NON_2XX_3XX_RESPONSE") {
         throw new Error(

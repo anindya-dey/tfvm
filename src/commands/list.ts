@@ -1,10 +1,16 @@
 import fs from "fs";
-import cheerio from "cheerio";
+import { load } from "cheerio";
 import got from "got";
 import inquirer from "inquirer";
 
-import { TERRAFORM_DOWNLOAD_URL, STORAGE_DIR } from "../configs";
-import { printSuccess, printError, printInfo, isTerraformLink } from "../utils";
+import { TERRAFORM_RELEASE_REPO, STORAGE_DIR } from "../configs";
+import {
+  printSuccess,
+  printError,
+  printInfo,
+  isTerraformLink,
+  extractTerraformVersion,
+} from "../utils";
 import {
   listOfAvailableTerraformVersions,
   checkInternetConnection,
@@ -16,21 +22,17 @@ import { ListArgs } from "../types/list-args";
 
 const list = ({ available }: ListArgs) => {
   if (available) {
-    got(TERRAFORM_DOWNLOAD_URL)
+    got(TERRAFORM_RELEASE_REPO)
       .then((response) => {
-        const $ = cheerio.load(response.body);
+        const $ = load(response.body);
 
         const terraformVersions: string[] = [];
 
         $("a")
-          .filter((_, a) => {
-            return isTerraformLink(a);
-          })
-          .each((i, link) => {
-            const href = link.attribs.href
-              .replace(/^\/terraform\//, "")
-              .replace(/\/$/, "");
-            terraformVersions.push(href);
+          .filter((_, link) => isTerraformLink(link.attribs?.href))
+          .each((_, link) => {
+            const href = extractTerraformVersion(link.attribs?.href);
+            href && terraformVersions.push(href);
           });
 
         inquirer
@@ -69,7 +71,7 @@ const list = ({ available }: ListArgs) => {
       //user has terraform executables
       printInfo(listOfLocallyAvailableTerraformVersions);
 
-      terraformExecutables.forEach((terraform, index) => {
+      terraformExecutables.forEach((terraform, _) => {
         printSuccess(`  ${terraform}`);
       });
     } else {
