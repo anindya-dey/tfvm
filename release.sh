@@ -46,12 +46,15 @@ fi
 VERSION_FROM_NPM=$(npm version $DESIRED_UPDATE_METHOD)
 VERSION_FROM_NPM_WITHOUT_THE_V=${VERSION_FROM_NPM:1}
 
+echo "Supplied Version - $1"
+echo "NPM Version - $VERSION_FROM_NPM_WITHOUT_THE_V"
+
 if [ $1 = $VERSION_FROM_NPM_WITHOUT_THE_V ]
 then
     git add .
     git commit -m "Release $VERSION_FROM_NPM"
     git tag v$1
-    git push --atomic origin $RELEASE_BRANCH_NAME v$1
+    git push --atomic origin $RELEASE_BRANCH_NAME
 else
     echo "🔴 Aborting!!! Desired version and version from npm are different! 🙄"
     exit 1
