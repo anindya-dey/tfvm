@@ -2,11 +2,11 @@ name: Run Tests
 
 on:
   pull_request:
-    branches: 
-      - 'main'
+    branches:
+      - "main"
   push:
-    branches: 
-      - '*'
+    branches:
+      - "*"
 
 jobs:
   run-unit-tests:

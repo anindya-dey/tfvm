@@ -4,7 +4,7 @@ import updateNotifier from "update-notifier";
 import list from "./commands/list";
 import download from "./commands/download";
 import dir from "./commands/dir";
-import { TERRAFORM_DOWNLOAD_URL, HOME_DIR } from "./configs";
+import { TERRAFORM_RELEASE_REPO, HOME_DIR } from "./configs";
 
 // // > Notify user about any updates
 import pkg from "../package.json";
@@ -30,7 +30,7 @@ const init = () => {
     .description("List all the downloaded versions of terraform")
     .option(
       "-a, --available",
-      `Displays a list of all terraform versions available at ${TERRAFORM_DOWNLOAD_URL}`
+      `Displays a list of all terraform versions available at ${TERRAFORM_RELEASE_REPO}`
     )
     .action(list);
 
