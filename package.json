@@ -1,6 +1,6 @@
 {
   "name": "tfvm",
-  "version": "0.3.2-rc.4",
+  "version": "0.3.2-rc.5",
   "description": "Terraform Version Manager",
   "author": {
     "name": "Anindya Dey",
@@ -62,8 +62,6 @@
     "prepare": "husky install",
     "test": "jest",
     "tsc:init": "tsc --init",
-    "preversion": "rm -rf dist && npm test",
-    "version": "npm run build",
     "postversion": "git push && git push --tags && rm -rf dist"
   },
   "engines": {
