@@ -1,7 +1,7 @@
 import fs from "fs";
 
-import { STORAGE_DIR } from "../configs/index.js";
-import { printSuccess, printError, printInfo } from "../utils/index.js";
+import { STORAGE_DIR } from "../configs";
+import { printSuccess, printError, printInfo } from "../utils";
 
 const dir = () => {
   if (fs.existsSync(STORAGE_DIR)) {

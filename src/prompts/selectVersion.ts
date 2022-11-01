@@ -1,6 +1,6 @@
 import inquirer from "inquirer";
 
-const selectVersion = (terraformVersions) => {
+const selectVersion = (terraformVersions: string[]) => {
   return inquirer.prompt([
     {
       type: "list",

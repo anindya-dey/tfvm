@@ -2,7 +2,7 @@ import { fetchTerraformVersions, downloadTerraform } from "../services";
 import { selectVersion, selectPackage } from "../prompts";
 import { printError } from "../utils";
 
-const download = async (version) => {
+const download = async (version: string) => {
   if (version) {
     await selectPackage(version)
       .then(async ({ selectedPackage }) => {

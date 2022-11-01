@@ -2,7 +2,7 @@ import inquirer from "inquirer";
 
 import { listTerraformExecutables } from "../services";
 
-const selectPackage = async (version) => {
+const selectPackage = async (version: string) => {
   return inquirer.prompt([
     {
       type: "list",

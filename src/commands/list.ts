@@ -12,14 +12,15 @@ import {
   noLocalTerraformVersionsAvailable,
   configureNewStoragePath,
 } from "../constants";
+import { ListArgs } from "../types/list-args";
 
-const list = ({ available }) => {
+const list = ({ available }: ListArgs) => {
   if (available) {
     got(TERRAFORM_DOWNLOAD_URL)
       .then((response) => {
         const $ = cheerio.load(response.body);
 
-        const terraformVersions = [];
+        const terraformVersions: string[] = [];
 
         $("a")
           .filter((_, a) => {
@@ -58,7 +59,7 @@ const list = ({ available }) => {
         }
       });
   } else {
-    let terraformExecutables = [];
+    let terraformExecutables: string[] = [];
 
     if (fs.existsSync(STORAGE_DIR)) {
       terraformExecutables = fs.readdirSync(STORAGE_DIR);

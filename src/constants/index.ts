@@ -6,7 +6,7 @@ import {
   configureNewStoragePath,
 } from "./list-messages";
 
-module.exports = {
+export {
   listOfAvailableTerraformVersions,
   checkInternetConnection,
   listOfLocallyAvailableTerraformVersions,

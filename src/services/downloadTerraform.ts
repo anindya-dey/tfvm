@@ -5,7 +5,7 @@ import download from "download";
 import { STORAGE_DIR } from "../configs";
 import { printInfo, printSuccess } from "../utils";
 
-const downloadTerraform = async (downloadUrl, version) => {
+const downloadTerraform = async (downloadUrl: string, version: string) => {
   printInfo(`Downloading terraform version "${version}"`);
 
   if (!fs.existsSync(STORAGE_DIR)) {

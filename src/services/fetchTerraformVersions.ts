@@ -1,5 +1,5 @@
 import got from "got";
-import cheerio from "cheerio";
+import { load } from "cheerio";
 
 import { TERRAFORM_DOWNLOAD_URL } from "../configs";
 import { isTerraformLink, extractTerraformLink } from "../utils";
@@ -7,8 +7,8 @@ import { isTerraformLink, extractTerraformLink } from "../utils";
 const fetchTerraformVersions = async () => {
   return got(TERRAFORM_DOWNLOAD_URL)
     .then((response) => {
-      const $ = cheerio.load(response.body);
-      const terraformVersions = [];
+      const $ = load(response.body);
+      const terraformVersions: string[] = [];
 
       $("a")
         .filter((_, link) => isTerraformLink(link))
@@ -22,10 +22,6 @@ const fetchTerraformVersions = async () => {
       if (err.code === "ENOTFOUND") {
         throw new Error(
           `Could not connect to ${TERRAFORM_DOWNLOAD_URL}. Check your internet connection!`
-        );
-      } else if (err.code === "ERR_NON_2XX_3XX_RESPONSE") {
-        throw new Error(
-          `Could not download version "${version}". Check if the version is correct, or you have permission to download it!`
         );
       } else {
         throw new Error(err);

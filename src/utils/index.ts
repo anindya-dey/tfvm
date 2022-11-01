@@ -4,7 +4,7 @@ import extractTerraformLink from "./extractTerraformLink";
 import extractTerraformExecutable from "./extractTerraformExecutable";
 import isTerraformPackage from "./isTerraformPackage";
 
-module.exports = {
+export {
   printError,
   printInfo,
   printSuccess,

@@ -1,11 +1,12 @@
 import cheerio from "cheerio";
 import got from "got";
 
-import { TERRAFORM_DOWNLOAD_URL } from "../config";
-import { isTerraformLink, printError } from "../utils/print";
+import { TERRAFORM_DOWNLOAD_URL } from "../configs";
+import { printError } from "./print";
+import isTerraformLink from "./isTerraformLink";
 
 const getTerraformVersions = () => {
-  const terraformVersions = [];
+  const terraformVersions: string[] = [];
 
   return got(TERRAFORM_DOWNLOAD_URL)
     .then((response) => {

@@ -8,10 +8,10 @@ import {
   isTerraformPackage,
 } from "../utils";
 
-const listTerraformExecutables = async (version) => {
+const listTerraformExecutables = async (version: string) => {
   return got(`${TERRAFORM_DOWNLOAD_URL}/${version}/`)
     .then((response) => {
-      const terraformExecutables = [];
+      const terraformExecutables: string[] = [];
       const $ = cheerio.load(response.body);
 
       $("a")
@@ -40,4 +40,4 @@ const listTerraformExecutables = async (version) => {
     });
 };
 
-module.exports = listTerraformExecutables;
+export default listTerraformExecutables;

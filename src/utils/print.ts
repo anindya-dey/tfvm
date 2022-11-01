@@ -1,22 +1,22 @@
 import chalk from "chalk";
 
-const printSuccess = (successMessage) => {
+const printSuccess = (successMessage: string) => {
   console.log(chalk.greenBright(successMessage));
 };
 
-const printError = (errorMessage) => {
+const printError = (errorMessage: string) => {
   console.log(chalk.redBright(errorMessage));
 };
 
-const printInfo = (infoMessage) => {
+const printInfo = (infoMessage: string) => {
   console.log(chalk.blueBright(infoMessage));
 };
 
-const printPlainText = (text) => {
+const printPlainText = (text: string) => {
   console.log(chalk.white(text));
 };
 
-export default {
+export {
   printSuccess,
   printError,
   printInfo,

@@ -6,7 +6,7 @@ const listOfLocallyAvailableTerraformVersions = `Here is a list of terraform exe
 const noLocalTerraformVersionsAvailable = `You don\'t have any terraform executables at ${STORAGE_DIR}.`;
 const configureNewStoragePath = `To configure an existing path or to set a new path, use tfvm dir -p <path/to/store/terraform/executables>`;
 
-export default {
+export {
   listOfAvailableTerraformVersions,
   checkInternetConnection,
   listOfLocallyAvailableTerraformVersions,
