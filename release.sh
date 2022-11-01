@@ -21,7 +21,9 @@ RELEASE_BRANCH_NAME="release-v$1"
 if [ -z "$(git status --porcelain)" ]
 then
     echo "🟢 Your working directory is clean. 👌"
+    echo "🟢 Creating new git branch $RELEASE_BRANCH_NAME... 🌵"
     git switch -c $RELEASE_BRANCH_NAME
+    git push --set-upstream origin $RELEASE_BRANCH_NAME
 else
     echo "🔴 Aborting!!! Your working directory is not clean! ✋"
     exit 1
