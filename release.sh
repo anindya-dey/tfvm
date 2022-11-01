@@ -55,6 +55,7 @@ then
     git commit -m "Release $VERSION_FROM_NPM"
     git tag v$1
     git push --atomic origin $RELEASE_BRANCH_NAME
+    git push --tags
 else
     echo "🔴 Aborting!!! Desired version and version from npm are different! 🙄"
     exit 1
