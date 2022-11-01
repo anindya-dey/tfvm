@@ -4,7 +4,13 @@ import got from "got";
 import inquirer from "inquirer";
 
 import { TERRAFORM_RELEASE_REPO, STORAGE_DIR } from "../configs";
-import { printSuccess, printError, printInfo, isTerraformLink, extractTerraformVersion } from "../utils";
+import {
+  printSuccess,
+  printError,
+  printInfo,
+  isTerraformLink,
+  extractTerraformVersion,
+} from "../utils";
 import {
   listOfAvailableTerraformVersions,
   checkInternetConnection,
@@ -25,7 +31,7 @@ const list = ({ available }: ListArgs) => {
         $("a")
           .filter((_, link) => isTerraformLink(link.attribs?.href))
           .each((_, link) => {
-            const href = extractTerraformVersion(link.attribs?.href)
+            const href = extractTerraformVersion(link.attribs?.href);
             href && terraformVersions.push(href);
           });
 

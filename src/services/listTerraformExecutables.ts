@@ -2,10 +2,7 @@ import { load } from "cheerio";
 import got from "got";
 
 import { TERRAFORM_RELEASE_REPO } from "../configs";
-import {
-  isTerraformLink,
-  isZipPackage,
-} from "../utils";
+import { isTerraformLink, isZipPackage } from "../utils";
 
 const listTerraformExecutables = async (version: string) => {
   return got(`${TERRAFORM_RELEASE_REPO}/${version}/`)
@@ -14,7 +11,11 @@ const listTerraformExecutables = async (version: string) => {
       const $ = load(response.body);
 
       $("a")
-        .filter((_, link) => isTerraformLink(link.attribs?.href) && isZipPackage(link.attribs?.href))
+        .filter(
+          (_, link) =>
+            isTerraformLink(link.attribs?.href) &&
+            isZipPackage(link.attribs?.href)
+        )
         .each((i, link) => {
           terraformExecutables.push(link.attribs?.href);
         });
