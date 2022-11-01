@@ -33,6 +33,7 @@ then
     DESIRED_UPDATE_METHOD=$2
     echo "🟢 Starting $DESIRED_UPDATE_METHOD version update... 🕓"
 elif [ -z $2 ]
+then
     echo "🟢 Starting $DESIRED_UPDATE_METHOD version update... 🕓"
 else
     echo "🔴 Aborting!!! The second argument must be 'major', 'minor', 'patch' or 'prerelease', or left blank. [Default is 'patch'] 🩹"
