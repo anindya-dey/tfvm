@@ -16,9 +16,4 @@ const printPlainText = (text: string) => {
   console.log(chalk.white(text));
 };
 
-export {
-  printSuccess,
-  printError,
-  printInfo,
-  printPlainText,
-};
+export { printSuccess, printError, printInfo, printPlainText };

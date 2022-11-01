@@ -1,3 +1,3 @@
 export type ListArgs = {
-  available: boolean
-}
+  available: boolean;
+};
