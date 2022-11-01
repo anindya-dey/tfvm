@@ -61,7 +61,10 @@
     "lint": "prettier --end-of-line crlf --write .",
     "prepare": "husky install",
     "test": "jest",
-    "tsc:init": "tsc --init"
+    "tsc:init": "tsc --init",
+    "preversion": "npm test",
+    "version": "npm run build",
+    "postversion": "git push && git push --tags && rm -rf dist"
   },
   "engines": {
     "node": ">= 16.14.0"
