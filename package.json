@@ -1,6 +1,6 @@
 {
   "name": "tfvm",
-  "version": "0.3.2-rc.8",
+  "version": "0.3.2-rc.9",
   "description": "Terraform Version Manager",
   "author": {
     "name": "Anindya Dey",
