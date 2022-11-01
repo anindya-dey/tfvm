@@ -31,6 +31,6 @@ const getTerraformVersions = () => {
         printError("Something is wrong. Please try again later.");
       }
     });
-}
+};
 
 export default getTerraformVersions;

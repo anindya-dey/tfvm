@@ -4,12 +4,7 @@ import got from "got";
 import inquirer from "inquirer";
 
 import { TERRAFORM_DOWNLOAD_URL, STORAGE_DIR } from "../configs";
-import {
-  printSuccess,
-  printError,
-  printInfo,
-  isTerraformLink,
-} from "../utils";
+import { printSuccess, printError, printInfo, isTerraformLink } from "../utils";
 import {
   listOfAvailableTerraformVersions,
   checkInternetConnection,
