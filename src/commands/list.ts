@@ -10,6 +10,7 @@ import {
   printInfo,
   isTerraformLink,
   extractTerraformVersion,
+  printPlainText,
 } from "../utils";
 import {
   listOfAvailableTerraformVersions,
@@ -19,8 +20,16 @@ import {
   configureNewStoragePath,
 } from "../constants";
 import { ListArgs } from "../types/list-args";
+import {
+  confirmDownload,
+  listVersion,
+  selectPackage,
+  selectVersion,
+} from "../prompts";
+import { downloadTerraform } from "../services";
 
 const list = ({ available }: ListArgs) => {
+  console.log(available);
   if (available) {
     got(TERRAFORM_RELEASE_REPO)
       .then((response) => {
@@ -35,25 +44,19 @@ const list = ({ available }: ListArgs) => {
             href && terraformVersions.push(href);
           });
 
-        inquirer
-          .prompt([
-            {
-              type: "list",
-              name: "terraformVersion",
-              message: listOfAvailableTerraformVersions,
-              choices: terraformVersions,
-              pageSize: 10,
-            },
-            {
-              type: "confirm",
-              name: "wantToDownload",
-              message: "Do you want to download this version?",
-              default: false,
-            },
-          ])
-          .then((answers) => {
-            printSuccess(JSON.stringify(answers, null, 4));
-          });
+        listVersion(terraformVersions)
+          .then(({ selectedVersion }) => {
+            confirmDownload(selectedVersion).then(({ wantToDownload }) => {
+              if (wantToDownload) {
+                selectPackage(selectedVersion).then(
+                  async ({ selectedPackage }) => {
+                    await downloadTerraform(selectedPackage, selectedVersion);
+                  }
+                );
+              }
+            });
+          })
+          .catch((err) => printError(JSON.stringify(err, null, 4)));
       })
       .catch((err) => {
         if (err.code === "ENOTFOUND") {
@@ -69,10 +72,10 @@ const list = ({ available }: ListArgs) => {
 
     if (terraformExecutables && terraformExecutables.length) {
       //user has terraform executables
-      printInfo(listOfLocallyAvailableTerraformVersions);
+      printPlainText(listOfLocallyAvailableTerraformVersions);
 
       terraformExecutables.forEach((terraform, _) => {
-        printSuccess(`  ${terraform}`);
+        printSuccess(`➤ ${terraform}`);
       });
     } else {
       //user does not have any terraform executables

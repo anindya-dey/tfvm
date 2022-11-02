@@ -59,7 +59,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "build:dev": "npm run build && npm link && tfvm",
+    "build:dev": "npm run build && npm link",
     "lint": "prettier --end-of-line crlf --write .",
     "prepare": "husky install",
     "test": "jest --verbose",
