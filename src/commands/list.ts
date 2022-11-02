@@ -20,11 +20,16 @@ import {
   configureNewStoragePath,
 } from "../constants";
 import { ListArgs } from "../types/list-args";
-import { confirmDownload, listVersion, selectPackage, selectVersion } from "../prompts";
+import {
+  confirmDownload,
+  listVersion,
+  selectPackage,
+  selectVersion,
+} from "../prompts";
 import { downloadTerraform } from "../services";
 
 const list = ({ available }: ListArgs) => {
-  console.log(available)
+  console.log(available);
   if (available) {
     got(TERRAFORM_RELEASE_REPO)
       .then((response) => {
@@ -41,17 +46,17 @@ const list = ({ available }: ListArgs) => {
 
         listVersion(terraformVersions)
           .then(({ selectedVersion }) => {
-            confirmDownload(selectedVersion)
-              .then(({ wantToDownload }) => {
-                if(wantToDownload) {
-                  selectPackage(selectedVersion)
-                    .then(async ({ selectedPackage }) => {
-                      await downloadTerraform(selectedPackage, selectedVersion);
-                    })
-                }
-              })
+            confirmDownload(selectedVersion).then(({ wantToDownload }) => {
+              if (wantToDownload) {
+                selectPackage(selectedVersion).then(
+                  async ({ selectedPackage }) => {
+                    await downloadTerraform(selectedPackage, selectedVersion);
+                  }
+                );
+              }
+            });
           })
-          .catch(err => printError(JSON.stringify(err, null, 4)))
+          .catch((err) => printError(JSON.stringify(err, null, 4)));
       })
       .catch((err) => {
         if (err.code === "ENOTFOUND") {

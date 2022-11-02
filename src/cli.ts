@@ -46,20 +46,20 @@ const init = () => {
   program
     .command("remove")
     .alias("r")
-    .description("removes a specific version all versions of terraform downloaded locally")
+    .description(
+      "removes a specific version all versions of terraform downloaded locally"
+    )
     .addOption(
       new Option(
         "-v, --version <version>",
         "Use this to remove a particular version of Terraform."
-      )
-      .conflicts("all")
+      ).conflicts("all")
     )
     .addOption(
       new Option(
         "-a, --all",
         `remove all versions of terraform from ${STORAGE_DIR}`
-      )
-      .conflicts("version")
+      ).conflicts("version")
     )
     .action(remove);
 
