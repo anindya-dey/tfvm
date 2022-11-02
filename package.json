@@ -1,6 +1,6 @@
 {
   "name": "tfvm",
-  "version": "0.3.2-rc.21",
+  "version": "0.4.0",
   "description": "Terraform Version Manager",
   "author": {
     "name": "Anindya Dey",
@@ -16,7 +16,7 @@
   },
   "preview": true,
   "bin": {
-    "tfvm": "./dist/main.js"
+    "tfvm": "./dist/tfvm.min.js"
   },
   "license": "MIT",
   "dependencies": {
@@ -50,6 +50,7 @@
     "@types/node": "^18.11.8",
     "@types/rc": "^1.2.1",
     "@types/update-notifier": "^6.0.1",
+    "esbuild": "^0.15.12",
     "execa": "^5.1.1",
     "husky": "^8.0.1",
     "jest": "^29.2.2",
@@ -58,7 +59,7 @@
     "typescript": "^4.8.4"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && esbuild ./dist/main.js --platform=node --external:./node_modules/* --bundle --minify --outfile=./dist/tfvm.min.js",
     "build:dev": "npm run build && npm link",
     "lint": "prettier --end-of-line crlf --write .",
     "prepare": "husky install",
@@ -69,6 +70,6 @@
     "node": ">= 16.14.0"
   },
   "files": [
-    "dist"
+    "./dist/tfvm.min.js"
   ]
 }
