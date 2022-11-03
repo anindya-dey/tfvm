@@ -1,31 +1,22 @@
 import fs from "fs";
 import { load } from "cheerio";
 import got from "got";
-import inquirer from "inquirer";
 
 import { TERRAFORM_RELEASE_REPO, STORAGE_DIR } from "../configs";
 import {
   printSuccess,
   printError,
-  printInfo,
   isTerraformLink,
   extractTerraformVersion,
   printPlainText,
 } from "../utils";
 import {
-  listOfAvailableTerraformVersions,
   checkInternetConnection,
   listOfLocallyAvailableTerraformVersions,
   noLocalTerraformVersionsAvailable,
-  configureNewStoragePath,
 } from "../constants";
 import { ListOptions } from "../types/list-options";
-import {
-  confirmDownload,
-  listVersion,
-  selectPackage,
-  selectVersion,
-} from "../prompts";
+import { confirmDownload, listVersion, selectPackageUrl } from "../prompts";
 import { downloadTerraform } from "../services";
 
 const list = ({ remote }: ListOptions) => {
@@ -47,9 +38,12 @@ const list = ({ remote }: ListOptions) => {
           .then(({ selectedVersion }) => {
             confirmDownload(selectedVersion).then(({ wantToDownload }) => {
               if (wantToDownload) {
-                selectPackage(selectedVersion).then(
-                  async ({ selectedPackage }) => {
-                    await downloadTerraform(selectedPackage, selectedVersion);
+                selectPackageUrl(selectedVersion).then(
+                  async ({ selectedPackageUrl }) => {
+                    await downloadTerraform(
+                      selectedPackageUrl,
+                      selectedVersion
+                    );
                   }
                 );
               }

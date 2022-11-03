@@ -1,4 +1,4 @@
-import { Argument, Option, program } from "commander";
+import { program } from "commander";
 import updateNotifier from "update-notifier";
 
 import { TERRAFORM_RELEASE_REPO, HOME_DIR, STORAGE_DIR } from "./configs";
@@ -26,7 +26,9 @@ const init = () => {
   program
     .command("list")
     .alias("ls")
-    .description("list all the downloaded versions of terraform")
+    .description(
+      `list all the downloaded versions of terraform or the ones available at ${TERRAFORM_RELEASE_REPO}`
+    )
     .option(
       "-r, --remote",
       `Displays a list of all terraform versions available at ${TERRAFORM_RELEASE_REPO}`
@@ -36,10 +38,12 @@ const init = () => {
   program
     .command("download")
     .alias("d")
-    .description("downloads a specific version of terraform")
+    .description(
+      `downloads and extracts a specific package of terraform from ${TERRAFORM_RELEASE_REPO}`
+    )
     .argument(
       "[version]",
-      "If provided, this version of Terraform would be downloaded. If not, user would see a list of available versions to choose from."
+      "If provided, a list of all the terraform packages for this version would be displayed for the user to choose from"
     )
     .action(download);
 
@@ -47,7 +51,7 @@ const init = () => {
     .command("remove")
     .alias("rm")
     .description(
-      "removes a specific version all versions of terraform downloaded locally"
+      `removes a specific package or all packages of terraform saved locally at ${STORAGE_DIR}`
     )
     .option("-a, --all", `remove all versions of terraform from ${STORAGE_DIR}`)
     .action(remove);
@@ -55,7 +59,7 @@ const init = () => {
   program
     .command("dir")
     .description(
-      `displays the directory where terraform executables are stored. Throws an error if the configured directory does not exist. Default directory is ${HOME_DIR}.`
+      `displays the directory where terraform executables are stored. Default directory is ${HOME_DIR}.`
     )
     .action(dir);
 
