@@ -19,7 +19,7 @@ import {
   noLocalTerraformVersionsAvailable,
   configureNewStoragePath,
 } from "../constants";
-import { ListArgs } from "../types/list-args";
+import { ListOptions } from "../types/list-options";
 import {
   confirmDownload,
   listVersion,
@@ -28,9 +28,8 @@ import {
 } from "../prompts";
 import { downloadTerraform } from "../services";
 
-const list = ({ available }: ListArgs) => {
-  console.log(available);
-  if (available) {
+const list = ({ remote }: ListOptions) => {
+  if (remote) {
     got(TERRAFORM_RELEASE_REPO)
       .then((response) => {
         const $ = load(response.body);
@@ -80,7 +79,7 @@ const list = ({ available }: ListArgs) => {
     } else {
       //user does not have any terraform executables
       printError(noLocalTerraformVersionsAvailable);
-      printInfo(configureNewStoragePath);
+      // printInfo(configureNewStoragePath);
     }
   }
 };

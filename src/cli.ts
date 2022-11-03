@@ -28,7 +28,7 @@ const init = () => {
     .alias("ls")
     .description("list all the downloaded versions of terraform")
     .option(
-      "-a, --available",
+      "-r, --remote",
       `Displays a list of all terraform versions available at ${TERRAFORM_RELEASE_REPO}`
     )
     .action(list);
@@ -45,22 +45,11 @@ const init = () => {
 
   program
     .command("remove")
-    .alias("r")
+    .alias("rm")
     .description(
       "removes a specific version all versions of terraform downloaded locally"
     )
-    .addOption(
-      new Option(
-        "-v, --version <version>",
-        "Use this to remove a particular version of Terraform."
-      ).conflicts("all")
-    )
-    .addOption(
-      new Option(
-        "-a, --all",
-        `remove all versions of terraform from ${STORAGE_DIR}`
-      ).conflicts("version")
-    )
+    .option("-a, --all", `remove all versions of terraform from ${STORAGE_DIR}`)
     .action(remove);
 
   program
