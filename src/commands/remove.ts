@@ -46,14 +46,17 @@ const remove = ({ all }: RemoveOptions) => {
       if (files.length == 0) {
         printInfo(`${STORAGE_DIR} is already empty.`);
       } else {
-        listLocalTerraformFiles(files)
-          .then((selectedLocalFile) => {
+        listLocalTerraformFiles(
+          files,
+          "Select the terraform file you want to remove:"
+        )
+          .then(({ selectedLocalFile }) => {
             try {
               fs.unlinkSync(path.join(STORAGE_DIR, selectedLocalFile));
+              printSuccess(`Removed ${selectedLocalFile} successfully!`);
             } catch (err) {
               printError(JSON.stringify(err, null, 4));
             }
-            printSuccess(`Removed ${selectedLocalFile} successfully!`);
           })
           .catch((err) => printError(JSON.stringify(err, null, 4)));
       }

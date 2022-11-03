@@ -1,11 +1,11 @@
 import inquirer from "inquirer";
 
-const listLocalTerraformFiles = (terraformFiles: string[]) => {
+const listLocalTerraformFiles = (terraformFiles: string[], message: string) => {
   return inquirer.prompt([
     {
       type: "list",
       name: "selectedLocalFile",
-      message: "Select the terraform file you want to remove:",
+      message: message,
       choices: terraformFiles,
       pageSize: 10,
     },

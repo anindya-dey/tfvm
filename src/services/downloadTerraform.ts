@@ -16,7 +16,7 @@ const downloadTerraform = async (
   );
 
   if (!fs.existsSync(STORAGE_DIR)) {
-    console.log(`Creating storage dir ${STORAGE_DIR}`);
+    printInfo(`Creating storage dir ${STORAGE_DIR}`);
     fs.mkdirSync(STORAGE_DIR);
   }
 

@@ -13,7 +13,7 @@ const printInfo = (infoMessage: string) => {
 };
 
 const printPlainText = (text: string) => {
-  console.log(chalk.white(text));
+  console.log(text);
 };
 
 export { printSuccess, printError, printInfo, printPlainText };

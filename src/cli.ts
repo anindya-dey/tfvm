@@ -1,10 +1,10 @@
 import { program } from "commander";
 import updateNotifier from "update-notifier";
 
-import { TERRAFORM_RELEASE_REPO, HOME_DIR, STORAGE_DIR } from "./configs";
+import { TERRAFORM_RELEASE_REPO, STORAGE_DIR } from "./configs";
 
 import pkg from "../package.json";
-import { dir, download, list, remove } from "./commands";
+import { dir, download, list, remove, use } from "./commands";
 
 // > Notify user about any updates
 updateNotifier({
@@ -57,9 +57,16 @@ const init = () => {
     .action(remove);
 
   program
+    .command("use")
+    .description(
+      `sets a specific terraform release from ${STORAGE_DIR} as default which can be used directly in the terminal.`
+    )
+    .action(use);
+
+  program
     .command("dir")
     .description(
-      `displays the directory where terraform executables are stored. Default directory is ${HOME_DIR}.`
+      `displays the directory where terraform executables are stored. Default directory is ${STORAGE_DIR}.`
     )
     .action(dir);
 
