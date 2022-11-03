@@ -9,13 +9,20 @@
 Install it globally to manage all the terraform versions
 
 ```sh
-# To install tfvm globally, run this
 $ npm install -g tfvm
 ```
 
 ## Available commands
 
-#### `list|ls [--remote | -r]`
+| Command  | Options      | Description |
+| -------- | ------------ | ----------- |
+| list     | --remote, -r | asdasd      |
+| download | [version]    |             |
+| remove   | --all, -a    |             |
+| use      |              |             |
+| dir      |              |             |
+
+#### `list | ls [--remote | -r]`
 
 Use this command to list the downloaded versions of terraform
 
@@ -29,15 +36,7 @@ Append `--remote` or `-r` with `list` to get a list of all available releases fr
 $ tfvm list --remote # displays the available releases from Terraform's website
 ```
 
-#### `dir`
-
-This command shows the directory where all the terraform executables are stored locally. The default path is the `$USER/terraform` directory.
-
-```sh
-$ tfvm dir # shows the directory where all the terraform executables are stored
-```
-
-#### `download|d [version]`
+#### `download | d [version]`
 
 This will present a list of available releases from terraform. Choose one with up/down arrow and hit `ENTER` to download it.
 
@@ -49,6 +48,38 @@ Optionally, a `version` can be appended to this command to download it directly,
 
 ```sh
 $ tfvm download 1.1.0
+```
+
+#### `remove | rm [--all | -a]`
+
+Use this to remove/delete a particular terraform executable or all terraform executables
+
+```sh
+$ tfvm remove # to remove a particular terraform executable
+```
+
+Optionally, a `version` can be appended to this command to download it directly, like so:
+
+```sh
+$ tfvm remove --all # to remove all the terraform executables
+```
+
+#### `use`
+
+This command will present a list of all the locally available terraform executables. Once a particular executable is selected, the user would be able to use `terraform` commands in the terminal.
+
+```sh
+$ tfvm dir # shows the directory where all the terraform executables are stored
+```
+
+> NOTE: User might have to perform one-time update of their PATH variable to include the path indicated by this command.
+
+#### `dir`
+
+This command shows the directory where all the terraform executables are stored locally. The default path is the `$USER/terraform` directory.
+
+```sh
+$ tfvm dir # shows the directory where all the terraform executables are stored
 ```
 
 ---
