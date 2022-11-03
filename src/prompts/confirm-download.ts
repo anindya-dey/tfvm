@@ -5,7 +5,7 @@ const confirmDownload = (terraformVersion: string) => {
     {
       type: "confirm",
       name: "wantToDownload",
-      message: `Do you want to download version ${terraformVersion}?`,
+      message: `Do you want to download a terraform release with version ${terraformVersion}?`,
       default: false,
     },
   ]);

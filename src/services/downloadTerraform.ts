@@ -5,18 +5,28 @@ import download from "download";
 import { STORAGE_DIR } from "../configs";
 import { printInfo, printSuccess } from "../utils";
 
-const downloadTerraform = async (downloadUrl: string, version: string) => {
-  printInfo(`Downloading terraform version "${version}"`);
+const downloadTerraform = async (
+  terraformPackageUrl: string,
+  version: string
+) => {
+  printInfo(
+    `Downloading and extracting terraform package "${path.basename(
+      terraformPackageUrl
+    )}"`
+  );
 
   if (!fs.existsSync(STORAGE_DIR)) {
-    console.log(`Creating storage dir ${STORAGE_DIR}`);
+    printInfo(`Creating storage dir ${STORAGE_DIR}`);
     fs.mkdirSync(STORAGE_DIR);
   }
 
-  await download(downloadUrl, `${STORAGE_DIR}`, {
+  await download(terraformPackageUrl, `${STORAGE_DIR}`, {
     extract: true,
     map: (file) => {
-      const fileNameWithoutExtension = path.basename(downloadUrl, ".zip");
+      const fileNameWithoutExtension = path.basename(
+        terraformPackageUrl,
+        ".zip"
+      );
       if (file.path == "terraform") {
         file.path = fileNameWithoutExtension;
       } else if ((file.path = "terraform.exe")) {
@@ -26,7 +36,9 @@ const downloadTerraform = async (downloadUrl: string, version: string) => {
     },
   })
     .then(() => {
-      printSuccess("Download successful!");
+      printSuccess(
+        `Successfully extracted from ${path.basename(terraformPackageUrl)}!`
+      );
     })
     .catch((err) => {
       throw new Error(

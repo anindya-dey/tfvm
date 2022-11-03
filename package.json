@@ -60,7 +60,7 @@
   },
   "scripts": {
     "build": "tsc && esbuild ./dist/main.js --platform=node --external:./node_modules/* --bundle --minify --outfile=./dist/tfvm.min.js",
-    "build:dev": "npm run build && npm link",
+    "build:dev": "npm run lint && npm run build && npm link",
     "lint": "prettier --end-of-line crlf --write .",
     "prepare": "husky install",
     "test": "jest --verbose",

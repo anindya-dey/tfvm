@@ -1,10 +1,10 @@
-import { Argument, Option, program } from "commander";
+import { program } from "commander";
 import updateNotifier from "update-notifier";
 
-import { TERRAFORM_RELEASE_REPO, HOME_DIR, STORAGE_DIR } from "./configs";
+import { TERRAFORM_RELEASE_REPO, STORAGE_DIR } from "./configs";
 
 import pkg from "../package.json";
-import { dir, download, list, remove } from "./commands";
+import { dir, download, list, remove, use } from "./commands";
 
 // > Notify user about any updates
 updateNotifier({
@@ -26,9 +26,11 @@ const init = () => {
   program
     .command("list")
     .alias("ls")
-    .description("list all the downloaded versions of terraform")
+    .description(
+      `list all the downloaded versions of terraform or the ones available at ${TERRAFORM_RELEASE_REPO}`
+    )
     .option(
-      "-a, --available",
+      "-r, --remote",
       `Displays a list of all terraform versions available at ${TERRAFORM_RELEASE_REPO}`
     )
     .action(list);
@@ -36,37 +38,35 @@ const init = () => {
   program
     .command("download")
     .alias("d")
-    .description("downloads a specific version of terraform")
+    .description(
+      `downloads and extracts a specific package of terraform from ${TERRAFORM_RELEASE_REPO}`
+    )
     .argument(
       "[version]",
-      "If provided, this version of Terraform would be downloaded. If not, user would see a list of available versions to choose from."
+      "If provided, a list of all the terraform packages for this version would be displayed for the user to choose from"
     )
     .action(download);
 
   program
     .command("remove")
-    .alias("r")
+    .alias("rm")
     .description(
-      "removes a specific version all versions of terraform downloaded locally"
+      `removes a specific package or all packages of terraform saved locally at ${STORAGE_DIR}`
     )
-    .addOption(
-      new Option(
-        "-v, --version <version>",
-        "Use this to remove a particular version of Terraform."
-      ).conflicts("all")
-    )
-    .addOption(
-      new Option(
-        "-a, --all",
-        `remove all versions of terraform from ${STORAGE_DIR}`
-      ).conflicts("version")
-    )
+    .option("-a, --all", `remove all versions of terraform from ${STORAGE_DIR}`)
     .action(remove);
+
+  program
+    .command("use")
+    .description(
+      `sets a specific terraform release from ${STORAGE_DIR} as default which can be used directly in the terminal.`
+    )
+    .action(use);
 
   program
     .command("dir")
     .description(
-      `displays the directory where terraform executables are stored. Throws an error if the configured directory does not exist. Default directory is ${HOME_DIR}.`
+      `displays the directory where terraform executables are stored. Default directory is ${STORAGE_DIR}.`
     )
     .action(dir);
 
