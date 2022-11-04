@@ -2,9 +2,8 @@ import { program } from "commander";
 import updateNotifier from "update-notifier";
 
 import { TERRAFORM_RELEASE_REPO, STORAGE_DIR } from "./configs";
-
-import pkg from "../package.json";
 import { dir, download, list, remove, use } from "./commands";
+import pkg from "../package.json";
 
 // > Notify user about any updates
 updateNotifier({
