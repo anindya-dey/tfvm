@@ -12,15 +12,7 @@ Install it globally to manage all the terraform versions
 $ npm install -g tfvm
 ```
 
-## Available commands
-
-| Command  | Options      | Description |
-| -------- | ------------ | ----------- |
-| list     | --remote, -r | asdasd      |
-| download | [version]    |             |
-| remove   | --all, -a    |             |
-| use      |              |             |
-| dir      |              |             |
+### Following is a list of commands that `tfvm` supports
 
 #### `list | ls [--remote | -r]`
 
