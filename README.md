@@ -24,12 +24,12 @@ $ npm install -g tfvm
 
   ```sh
   $ tfvm list # gets all the locally available terraform executables
-  
+
   # --- OR ---
-  
+
   $ tfvm ls
   ```
-  
+
   ![](https://github.com/anindya-dey/tfvm/blob/main/assets/gifs/ls.gif)
 
 - Append `--remote` or `-r` with `list` to get a list of all available releases from [Terraform](https://releases.hashicorp.com/terraform)
@@ -57,7 +57,7 @@ $ npm install -g tfvm
   ```sh
   $ tfvm download
   ```
-  
+
   ![](https://github.com/anindya-dey/tfvm/blob/main/assets/gifs/download.gif)
 
 - Optionally, a `version` can be appended to this command which would directly present a list of releases, associated to this version:
@@ -105,7 +105,7 @@ $ npm install -g tfvm
   ```sh
   $ tfvm dir # shows the directory where all the terraform executables are stored
   ```
-  
+
   ![](https://github.com/anindya-dey/tfvm/blob/main/assets/gifs/dir.gif)
 
 ---
