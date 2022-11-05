@@ -132,10 +132,11 @@ $ npm install -g tfvm
 
 > **NOTES:**
 >
-> 1. Currently, platform specfic releases are not filtered out when executing `tfvm list --remote` or `tfvm download [version]` command. User needs to make sure that they are downloaing the right release for their system.
+> 1. Currently, platform specfic releases are not filtered out when executing `tfvm list --remote` or `tfvm download [version]` command. User needs to make sure that they are downloading the right release for their system.
 
 ---
 
-⭐ :heart: _This project is inspired by the [nvm project](https://github.com/nvm-sh/nvm)_ 😍 ⭐
 
-⭐ :heart: _Also thanks to [terminalizer](https://www.npmjs.com/package/terminalizer) using which I have created these beautiful gifs_ 😍 ⭐
+⭐ _This project is inspired by the [nvm project](https://github.com/nvm-sh/nvm)_ 😍
+
+⭐ _I created these beautiful gifs by using [terminalizer](https://www.npmjs.com/package/terminalizer)_ 😍
