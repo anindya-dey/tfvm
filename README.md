@@ -1,12 +1,10 @@
 > **CAUTION:** This project is under development. The README would be updated with the relevant documentations once I release the first production version (v1).
 
-# Terraform Version Manager
-
-[![npm version](https://img.shields.io/npm/v/tfvm?color=blue&label=version&style=flat-square)](https://www.npmjs.com/package/tfvm) [![downloads per week](https://img.shields.io/npm/dw/tfvm)](https://www.npmjs.com/package/tfvm) [![license](https://img.shields.io/npm/l/tfvm?color=lightblue)](https://www.npmjs.com/package/tfvm)
-
-<br />
+# Terraform Version Manager 
 
 ### A NodeJS-based CLI tool to manage terraform versions on a system
+
+[![npm version](https://img.shields.io/npm/v/tfvm?color=blue&label=version&style=flat-square)](https://www.npmjs.com/package/tfvm) [![downloads per week](https://img.shields.io/npm/dw/tfvm)](https://www.npmjs.com/package/tfvm) [![license](https://img.shields.io/npm/l/tfvm?color=lightblue)](https://www.npmjs.com/package/tfvm)
 
 Install it globally to manage all the terraform versions
 
@@ -17,6 +15,8 @@ $ npm install -g tfvm
 ![](https://github.com/anindya-dey/tfvm/blob/main/assets/gifs/tfvm.gif)
 
 ### Available Commands
+
+---
 
 #### `list | ls [--remote | -r]`
 
@@ -41,7 +41,7 @@ $ npm install -g tfvm
 - If you do not have any terraform executables on your path, you would see an error, like so:
   ![](https://github.com/anindya-dey/tfvm/blob/main/assets/gifs/tfvm-ls-when-empty.gif)
 
-<br />
+---
 
 #### `download | d [version]`
 
@@ -56,8 +56,9 @@ $ npm install -g tfvm
   ```sh
   $ tfvm download 1.1.0
   ```
+  ![](https://github.com/anindya-dey/tfvm/blob/main/assets/gifs/tfvm-download-version.gif)
 
-<br />
+---
 
 #### `remove | rm [--all | -a]`
 
@@ -73,7 +74,7 @@ $ npm install -g tfvm
   $ tfvm remove --all # to remove all the terraform executables
   ```
 
-<br />
+---
 
 #### `use`
 
@@ -85,7 +86,7 @@ $ npm install -g tfvm
 
 > NOTE: User might have to perform a one-time update of their PATH variable to include the path indicated by this command.
 
-<br />
+---
 
 #### `dir`
 
@@ -95,7 +96,7 @@ $ npm install -g tfvm
   $ tfvm dir # shows the directory where all the terraform executables are stored
   ```
 
-<br />
+---
 
 > **NOTES:**
 >
