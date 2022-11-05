@@ -17,12 +17,12 @@ config:
   # Explicitly set the number of columns
   # or use `auto` to take the current
   # number of columns of your shell
-  cols: 100
+  cols: 120
 
   # Explicitly set the number of rows
   # or use `auto` to take the current
   # number of rows of your shell
-  rows: 10
+  rows: 15
 
   # Amount of times to repeat GIF
   # If value is -1, play once
@@ -110,35 +110,77 @@ config:
 
 # Records, feel free to edit them
 records:
-  - delay: 458
+  - delay: 5
     content: "\r\e[01;32m➜  \e[36m~ \e[00m "
-  - delay: 1019
+  - delay: 200
     content: t
-  - delay: 167
-    content: f
-  - delay: 184
+  - delay: 200
+    content: "\btf"
+  - delay: 200
     content: v
-  - delay: 184
+  - delay: 200
     content: m
-  - delay: 104
+  - delay: 200
     content: " "
-  - delay: 192
+  - delay: 200
+    content: u
+  - delay: 200
+    content: s
+  - delay: 200
+    content: e
+  - delay: 200
+    content: "\e[?1l\e>\e[?2004l\r\r\n\e]2;tfvm use\a\e]1;tfvm\a"
+  - delay: 200
+    content: "Here is a list of terraform executables present at /home/username/.tfvm:\r\n\e[?25l\e[32m?\e[39m \e[1mSelect the terraform file you want to use:\e[22m\e[0m \e[0m\e[2m(Use arrow keys)\e[22m\r\n\e[36m❯ terraform_1.3.2_linux_amd64\e[39m \r\n  terraform_1.3.3_linux_amd64 \r\n  terraform_1.3.4_linux_amd64 \e[30D\e[30C"
+  - delay: 500
+    content: "\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[G\e[32m?\e[39m \e[1mSelect the terraform file you want to use:\e[22m\e[0m \e[0m\r\n  terraform_1.3.2_linux_amd64 \r\n\e[36m❯ terraform_1.3.3_linux_amd64\e[39m \r\n  terraform_1.3.4_linux_amd64 \e[30D\e[30C"
+  - delay: 500
+    content: "\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[G\e[32m?\e[39m \e[1mSelect the terraform file you want to use:\e[22m\e[0m \e[0m\r\n  terraform_1.3.2_linux_amd64 \r\n  terraform_1.3.3_linux_amd64 \r\n\e[36m❯ terraform_1.3.4_linux_amd64\e[39m \e[30D\e[30C"
+  - delay: 500
+    content: "\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[G\e[32m?\e[39m \e[1mSelect the terraform file you want to use:\e[22m\e[0m \e[0m\e[36mterraform_1.3.4_linux_amd64\e[39m\e[72D\e[72C\r\n\e[?25h"
+  - delay: 50
+    content: "\e[92m\"terraform_1.3.4_linux_amd64\" has been set as the default terraform version.\e[39m\r\n\e[92m             \e[39m\r\n\e[92mMake sure that \"/home/username/tfvm\" is added to your PATH variable. This would be a one-time effort.\e[39m\r\n\e[92m             \e[39m\r\n\e[92mNow, type \"terraform --version\" to verify.\e[39m\r\n\e[?25h\e[1m\e[7m%\e[27m\e[1m\e[0m \r\e[01;32m➜  \e[36m~ \e[00m "
+  - delay: 200
+    content: t
+  - delay: 100
+    content: "\bte"
+  - delay: 100
     content: r
-  - delay: 144
-    content: m
-  - delay: 112
-    content: " "
-  - delay: 496
-    content: "-"
-  - delay: 120
+  - delay: 100
+    content: r
+  - delay: 100
     content: a
-  - delay: 496
-    content: "\e[?1l\e>\e[?2004l\r\r\n\e]2;tfvm rm -a\a\e]1;tfvm\a"
-  - delay: 231
-    content: "\e[32m?\e[39m \e[1mDo you want to remove all the terraform versions available at /home/username/.tfvm?\e[22m\e[0m \e[0m\e[2m(y/N) \e[22m\e[91D\e[91C"
-  - delay: 1625
-    content: "\e[2K\e[G\e[32m?\e[39m \e[1mDo you want to remove all the terraform versions available at /home/username/.tfvm?\e[22m\e[0m \e[0m\e[2m(y/N) \e[22mY\e[92D\e[92C"
-  - delay: 776
-    content: "\e[2K\e[G\e[32m?\e[39m \e[1mDo you want to remove all the terraform versions available at /home/username/.tfvm?\e[22m\e[0m \e[0m\e[36mYes\e[39m\e[88D\e[88C\r\n\e[94mRemoving all terraform versions from /home/username/.tfvm...\e[39m\r\n\e[94m➤ Removed terraform_1.3.0_linux_arm64\e[39m\r\n\e[94m➤ Removed terraform_1.3.2_linux_amd64\e[39m\r\n\e[94m➤ Removed terraform_1.3.2_linux_arm64\e[39m\r\n\e[94m➤ Removed terraform_1.3.3_linux_arm64\e[39m\r\n\e[92mSuccessfully removed all terraform versions from /home/username/.tfvm\e \r\n\e[01;32m➜  \e[36m~ \e[00m "
-  - delay: 2500
-    content: "\e[?2004l"
+  - delay: 100
+    content: f
+  - delay: 200
+    content: o
+  - delay: 200
+    content: r
+  - delay: 100
+    content: m
+  - delay: 150
+    content: " "
+  - delay: 100
+    content: "-"
+  - delay: 100
+    content: "-"
+  - delay: 150
+    content: v
+  - delay: 150
+    content: e
+  - delay: 100
+    content: r
+  - delay: 100
+    content: s
+  - delay: 100
+    content: i
+  - delay: 100
+    content: o
+  - delay: 100
+    content: "n"
+  - delay: 200
+    content: "\e[?1l\e>\e[?2004l\r\r\n\e]2;terraform --version\a\e]1;terraform\a"
+  - delay: 1000
+    content: "Terraform v1.3.4\r\non linux_amd64\r\n\e[1m\e[7m%\e[27m\e[1m\e[0m \r\e[01;32m➜  \e[36m~ \e[00m "
+  - delay: 1000
+    content: "\e[?2004l\r\r\n"
