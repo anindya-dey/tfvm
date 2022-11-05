@@ -12,7 +12,7 @@ Install it globally to manage all the terraform versions
 $ npm install -g tfvm
 ```
 
-![](https://github.com/anindya-dey/tfvm/blob/main/assets/gifs/tfvm.gif)
+![](https://github.com/anindya-dey/tfvm/blob/main/assets/gifs/default.gif)
 
 ### Available Commands
 
