@@ -104,3 +104,5 @@ $ npm install -g tfvm
 ---
 
 :heart: _This project is inspired by the [nvm project](https://github.com/nvm-sh/nvm)_ :pray:
+
+:heart: _Also thanks to [terminalizer](https://www.npmjs.com/package/terminalizer) using which I have created these beautiful gifs_ 🙌
