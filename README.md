@@ -30,13 +30,14 @@ $ npm install -g tfvm
 
   ```sh
   $ tfvm list --remote # displays the available releases from Terraform's website
-  
+
   # --- OR ---
-  
+
   $ tfvm ls -r
   ```
+
   ![](https://github.com/anindya-dey/tfvm/blob/main/assets/gifs/tfvm-ls-remote.gif)
-  
+
 - If you do not have any terraform executables on your path, you would see an error, like so:
   ![](https://github.com/anindya-dey/tfvm/blob/main/assets/gifs/tfvm-ls-when-empty.gif)
 
