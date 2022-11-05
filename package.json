@@ -16,7 +16,7 @@
   },
   "preview": true,
   "bin": {
-    "tfvm": "./dist/tfvm.min.js"
+    "tfvm": "./dist/main.js"
   },
   "license": "MIT",
   "dependencies": {
