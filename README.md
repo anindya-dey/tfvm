@@ -56,6 +56,10 @@ $ npm install -g tfvm
 
   ```sh
   $ tfvm download
+  
+  # --- OR ---
+  
+  $ tfvm d
   ```
 
   ![](https://github.com/anindya-dey/tfvm/blob/main/assets/gifs/download.gif)
@@ -63,7 +67,11 @@ $ npm install -g tfvm
 - Optionally, a `version` can be appended to this command which would directly present a list of releases, associated to this version:
 
   ```sh
-  $ tfvm download 1.1.0
+  $ tfvm download 1.3.1
+  
+  # --- OR ---
+  
+  $ tfvm d 1.3.1
   ```
 
   ![](https://github.com/anindya-dey/tfvm/blob/main/assets/gifs/download-version.gif)
@@ -76,13 +84,25 @@ $ npm install -g tfvm
 
   ```sh
   $ tfvm remove # to remove a particular terraform executable
+  
+  # --- OR ---
+  
+  $ tfvm rm
   ```
+  
+  ![](https://github.com/anindya-dey/tfvm/blob/main/assets/gifs/remove.gif)
 
 - Use `--all` or `-a` option to remove all the terraform executables.
 
   ```sh
   $ tfvm remove --all # to remove all the terraform executables
+  
+  # --- OR ---
+  
+  $ tfvm rm -a
   ```
+  
+  ![](https://github.com/anindya-dey/tfvm/blob/main/assets/gifs/remove-all.gif)
 
 ---
 
@@ -93,6 +113,8 @@ $ npm install -g tfvm
   ```sh
   $ tfvm use # select a terraform executable as default, which can be used via 'terraform' command
   ```
+  
+  ![](https://github.com/anindya-dey/tfvm/blob/main/assets/gifs/use.gif)
 
 > NOTE: User might have to perform a one-time update of their PATH variable to include the path indicated by this command.
 
