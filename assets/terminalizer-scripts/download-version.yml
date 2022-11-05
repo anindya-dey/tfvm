@@ -17,12 +17,12 @@ config:
   # Explicitly set the number of columns
   # or use `auto` to take the current
   # number of columns of your shell
-  cols: 140
+  cols: 90
 
   # Explicitly set the number of rows
   # or use `auto` to take the current
   # number of rows of your shell
-  rows: 20
+  rows: 15
 
   # Amount of times to repeat GIF
   # If value is -1, play once
@@ -152,9 +152,9 @@ records:
     content: "1"
   - delay: 680
     content: "\e[?1l\e>\e[?2004l\r\r\n\e]2;tfvm download 1.3.1\a\e]1;tfvm\a"
-  - delay: 1431
+  - delay: 1000
     content: "\e[?25l\e[32m?\e[39m \e[1mSelect the available release for version \"1.3.1\": \e[22m\e[0m \e[0m\e[2m(Use arrow keys)\e[22m\r\n\e[36m❯ terraform_1.3.1_darwin_amd64.zip\e[39m \r\n  terraform_1.3.1_darwin_arm64.zip \r\n  terraform_1.3.1_freebsd_386.zip \r\n  terraform_1.3.1_freebsd_amd64.zip \r\n  terraform_1.3.1_freebsd_arm.zip \r\n  terraform_1.3.1_linux_386.zip \r\n  terraform_1.3.1_linux_amd64.zip \r\n  terraform_1.3.1_linux_arm.zip \r\n  terraform_1.3.1_linux_arm64.zip \r\n  terraform_1.3.1_openbsd_386.zip \r\n\e[2m(Move up and down to reveal more choices)\e[22m\e[41D\e[41C"
-  - delay: 1335
+  - delay: 1000
     content: "\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[G\e[32m?\e[39m \e[1mSelect the available release for version \"1.3.1\": \e[22m\e[0m \e[0m\r\n  terraform_1.3.1_darwin_amd64.zip \r\n\e[36m❯ terraform_1.3.1_darwin_arm64.zip\e[39m \r\n  terraform_1.3.1_freebsd_386.zip \r\n  terraform_1.3.1_freebsd_amd64.zip \r\n  terraform_1.3.1_freebsd_arm.zip \r\n  terraform_1.3.1_linux_386.zip \r\n  terraform_1.3.1_linux_amd64.zip \r\n  terraform_1.3.1_linux_arm.zip \r\n  terraform_1.3.1_linux_arm64.zip \r\n  terraform_1.3.1_openbsd_386.zip \r\n\e[2m(Move up and down to reveal more choices)\e[22m\e[41D\e[41C"
   - delay: 141
     content: "\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[1A\e[2K\e[G\e[32m?\e[39m \e[1mSelect the available release for version \"1.3.1\": \e[22m\e[0m \e[0m\r\n  terraform_1.3.1_darwin_amd64.zip \r\n  terraform_1.3.1_darwin_arm64.zip \r\n\e[36m❯ terraform_1.3.1_freebsd_386.zip\e[39m \r\n  terraform_1.3.1_freebsd_amd64.zip \r\n  terraform_1.3.1_freebsd_arm.zip \r\n  terraform_1.3.1_linux_386.zip \r\n  terraform_1.3.1_linux_amd64.zip \r\n  terraform_1.3.1_linux_arm.zip \r\n  terraform_1.3.1_linux_arm64.zip \r\n  terraform_1.3.1_openbsd_386.zip \r\n\e[2m(Move up and down to reveal more choices)\e[22m\e[41D\e[41C"

@@ -1,6 +1,6 @@
 > **CAUTION:** This project is under development. The README would be updated with the relevant documentations once I release the first production version (v1).
 
-# Terraform Version Manager 
+# Terraform Version Manager
 
 ### A NodeJS-based CLI tool to manage terraform versions on a system
 
@@ -56,6 +56,7 @@ $ npm install -g tfvm
   ```sh
   $ tfvm download 1.1.0
   ```
+
   ![](https://github.com/anindya-dey/tfvm/blob/main/assets/gifs/tfvm-download-version.gif)
 
 ---
