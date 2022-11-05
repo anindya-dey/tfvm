@@ -14,6 +14,8 @@ Install it globally to manage all the terraform versions
 $ npm install -g tfvm
 ```
 
+![](./assets/gifs/tfvm.gif)
+
 ### Available Commands
 
 #### `list | ls [--remote | -r]`
