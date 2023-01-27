@@ -16,7 +16,6 @@ $ npm install -g tfvm
 
 ![default](https://user-images.githubusercontent.com/30517208/215016872-45b400f6-5738-4404-876e-f886f6e77fdb.gif)
 
-
 ### Available Commands
 
 ---
@@ -35,7 +34,6 @@ $ npm install -g tfvm
 
   ![ls](https://user-images.githubusercontent.com/30517208/215016919-d4d38647-bc18-48ce-961a-9a27f088e349.gif)
 
-
 - Append `--remote` or `-r` with `list` to get a list of all available releases from [Terraform](https://releases.hashicorp.com/terraform)
 
   ```sh
@@ -45,9 +43,8 @@ $ npm install -g tfvm
 
   $ tfvm ls -r
   ```
-  
+
   ![ls-remote](https://user-images.githubusercontent.com/30517208/215016945-d68d2db7-f3eb-47fd-931b-4db05ee0ab7b.gif)
-  
 
 - If you do not have any terraform executables on your path, you would see an error, like so:
 
@@ -66,9 +63,9 @@ $ npm install -g tfvm
 
   $ tfvm d
   ```
-  
+
   ![download](https://user-images.githubusercontent.com/30517208/215017148-f18bb0a4-cf7f-45a4-9e68-b33d8d46beba.gif)
-  
+
 - Optionally, a `version` can be appended to this command which would directly present a list of releases, associated to this version:
 
   ```sh
