@@ -2,7 +2,11 @@
 
 ### A NodeJS-based CLI tool to manage terraform versions on a system
 
-[![npm version](https://img.shields.io/npm/v/tfvm?color=blue&label=version&style=flat-square)](https://www.npmjs.com/package/tfvm) [![downloads per week](https://img.shields.io/npm/dw/tfvm)](https://www.npmjs.com/package/tfvm) [![license](https://img.shields.io/npm/l/tfvm?color=lightblue)](https://www.npmjs.com/package/tfvm)
+<br />
+
+[![npm version](https://img.shields.io/npm/v/tfvm?color=blue&label=version&style=for-the-badge)](https://www.npmjs.com/package/tfvm) [![Total Downloads](https://img.shields.io/npm/dt/tfvm?label=total%20downloads&style=for-the-badge)](https://www.npmjs.com/package/tfvm) [![license](https://img.shields.io/npm/l/tfvm?color=lightblue&style=for-the-badge)](https://www.npmjs.com/package/tfvm)
+
+<br />
 
 Install it globally to manage all the terraform versions
 
