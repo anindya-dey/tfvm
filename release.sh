@@ -1,3 +1,5 @@
+# Example: bash ./release.sh 1.0.1 patch
+
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 
 if [[ $BRANCH = "main" ]]
