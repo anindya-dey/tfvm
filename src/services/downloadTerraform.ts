@@ -40,9 +40,13 @@ const downloadTerraform = async (
         `Successfully extracted from ${path.basename(terraformPackageUrl)}!`
       );
     })
-    .catch((err) => {
+    .catch((err: any) => {
       throw new Error(
-        "Download failed. Check your internet connectivity or try again later!"
+        `Download failed. Check your internet connectivity or try again later! For more details: ${JSON.stringify(
+          err,
+          null,
+          4
+        )}`
       );
     });
 };
