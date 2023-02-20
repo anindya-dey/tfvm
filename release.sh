@@ -1,5 +1,19 @@
 # Example: bash ./release.sh 1.0.1 patch
 
+if [ -z $1 ]
+then
+    echo "🔴 Enter release version! 🚫"
+    echo "🔴 Command should be in the format 'bash ./release.sh <version> <version_method (like patch, minor, major, etc)>' 🚫"
+    exit 1
+fi
+
+if [ -z $2 ]
+then
+    echo "🔴 Enter version method like patch, minor, major, etc! 🚫"
+    echo "🔴 Command should be in the format 'bash ./release.sh <version> <version_method (like patch, minor, major, etc)>' 🚫"
+    exit 1
+fi
+
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 
 if [[ $BRANCH = "main" ]]
