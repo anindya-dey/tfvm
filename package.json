@@ -44,6 +44,7 @@
     "build:dev": "npm run lint && npm run build && npm link",
     "lint": "prettier --end-of-line crlf --write .",
     "prepare": "husky install",
+    "tfvm:help": "node dist/tfvm.min.js --help",
     "test": "jest --verbose",
     "tsc:init": "tsc --init"
   },
