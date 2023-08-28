@@ -19,13 +19,19 @@ jobs:
     needs: run-tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout
+        uses: actions/checkout@latest
+      - name: Install Node.js v20
+        uses: actions/setup-node@latest
         with:
-          node-version: 18
-          registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm run build
-      - run: npm publish
+          node-version: 20
+      - name: Install PNPM
+        uses: pnpm/action-setup@latest
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build tfvm package
+        run: pnpm build
+      - name: Publish tfvm to NPM
+        run: pnpm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
