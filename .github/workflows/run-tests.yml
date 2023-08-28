@@ -9,11 +9,17 @@ jobs:
   run-unit-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout
+        uses: actions/checkout@latest
+      - name: Install Node.js v20
+        uses: actions/setup-node@latest
         with:
           node-version: 20
-      - run: npm ci
-      - run: npm run build
-      - run: npm link && tfvm --version
-      - run: npm run test
+      - name: Install PNPM
+        uses: pnpm/action-setup@latest
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build tfvm package
+        run: pnpm build
+      - name: Link and test tfvm
+        run: pnpm link .dist && pnpm test
