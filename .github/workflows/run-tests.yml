@@ -10,13 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@latest
+        uses: actions/checkout@v3
       - name: Install Node.js v20
-        uses: actions/setup-node@latest
+        uses: actions/setup-node@v3
         with:
           node-version: 20
       - name: Install PNPM
-        uses: pnpm/action-setup@latest
+        uses: pnpm/action-setup@v2
       - name: Install dependencies
         run: pnpm install
       - name: Build tfvm package
