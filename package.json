@@ -16,7 +16,7 @@
   },
   "preview": true,
   "bin": {
-    "tfvm": "./dist/tfvm.min.js"
+    "tfvm": "./.dist/tfvm.min.js"
   },
   "license": "MIT",
   "dependencies": {
@@ -40,11 +40,11 @@
     "anindya"
   ],
   "scripts": {
-    "build": "tsc && esbuild ./dist/main.js --platform=node --external:./node_modules/* --bundle --minify --outfile=./dist/tfvm.min.js",
+    "build": "tsc && esbuild ./.dist/main.js --platform=node --external:./node_modules/* --bundle --minify --outfile=./.dist/tfvm.min.js",
     "build:dev": "npm run lint && npm run build && npm link",
     "lint": "prettier --end-of-line crlf --write .",
     "prepare": "husky install",
-    "tfvm:help": "node dist/tfvm.min.js --help",
+    "tfvm:help": "node .dist/tfvm.min.js --help",
     "test": "jest --verbose",
     "tsc:init": "tsc --init"
   },
@@ -52,7 +52,7 @@
     "node": ">= 16.14.0"
   },
   "files": [
-    "./dist/tfvm.min.js"
+    "./.dist/tfvm.min.js"
   ],
   "devDependencies": {
     "@types/download": "^8.0.2",
