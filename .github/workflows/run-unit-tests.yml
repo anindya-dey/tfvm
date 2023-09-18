@@ -2,8 +2,7 @@ name: Run Tests
 
 on:
   pull_request:
-    branches:
-      - "main"
+    branches: [main]
 
 jobs:
   run-unit-tests:
@@ -15,9 +14,12 @@ jobs:
       - name: Use Node LTS ✨
         uses: actions/setup-node@v3
         with:
-          node-version: lts/*
-          registry-url: https://registry.npmjs.org
-          cache: pnpm
+          node-version: latest
+
+      - name: Install pnpm 🌩️
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
 
       - name: Install dependencies 📦️
         run: pnpm install --frozen-lockfile
