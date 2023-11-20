@@ -137,6 +137,7 @@ $ npm install -g tfvm
 > **NOTES:**
 >
 > 1. Currently, platform specfic releases are not filtered out when executing `tfvm list --remote` or `tfvm download [version]` command. User needs to make sure that they are downloading the right release for their system.
+> 2. Chalk v4.1.2 is used as it supports typescript; Chalk >= v5 is purely ESM.
 
 ---
 
