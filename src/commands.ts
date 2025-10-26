@@ -2,7 +2,7 @@ import { existsSync, readdirSync, rmSync, mkdirSync, copyFileSync, chmodSync, st
 import { appendFile, readFile } from "fs/promises";
 import { join } from "path";
 import { homedir } from "os";
-import { TERRAFORM_RELEASE_REPO, STORAGE_DIR, TFVM_PATH } from "./config";
+import { TERRAFORM_RELEASE_REPO, STORAGE_DIR } from "./config";
 import { printSuccess, printError, printInfo, printPlainText } from "./utils";
 import { fetchTerraformVersions, listTerraformExecutables, downloadTerraform } from "./services";
 import { 
@@ -34,14 +34,14 @@ const addToPath = async (): Promise<void> => {
     // Windows: Provide instructions for manual PATH setup
     printInfo(`To use terraform globally on Windows:`);
     printInfo(`1. Open System Properties > Environment Variables`);
-    printInfo(`2. Add "${TFVM_PATH}" to your PATH variable`);
+    printInfo(`2. Add "${STORAGE_DIR}" to your PATH variable`);
     printInfo(`   OR run in PowerShell (Admin):`);
-    printInfo(`   [Environment]::SetEnvironmentVariable("Path", $env:Path + ";${TFVM_PATH}", "User")`);
+    printInfo(`   [Environment]::SetEnvironmentVariable("Path", $env:Path + ";${STORAGE_DIR}", "User")`);
     return;
   }
   
   // Unix-based systems (Linux & macOS)
-  const pathExport = `\n# Added by tfvm\nexport PATH="${TFVM_PATH}:$PATH"\n`;
+  const pathExport = `\n# Added by tfvm\nexport PATH="${STORAGE_DIR}:$PATH"\n`;
   
   // Detect shell configuration files
   const shellFiles = [
@@ -55,12 +55,12 @@ const addToPath = async (): Promise<void> => {
 
   for (const shellFile of shellFiles) {
     if (existsSync(shellFile)) {
-      const alreadyAdded = await isPathInShellConfig(shellFile, TFVM_PATH);
+      const alreadyAdded = await isPathInShellConfig(shellFile, STORAGE_DIR);
       
       if (!alreadyAdded) {
         try {
           await appendFile(shellFile, pathExport);
-          printSuccess(`Added ${TFVM_PATH} to ${shellFile}`);
+          printSuccess(`Added ${STORAGE_DIR} to ${shellFile}`);
           updated = true;
         } catch (error: any) {
           printError(`Failed to update ${shellFile}: ${error.message}`);
@@ -73,7 +73,7 @@ const addToPath = async (): Promise<void> => {
     const shellHint = platform === 'darwin' ? '~/.zshrc or ~/.bash_profile' : '~/.bashrc';
     printInfo(`Restart your terminal or run: source ${shellHint}`);
   } else {
-    printInfo(`${TFVM_PATH} is already in your PATH`);
+    printInfo(`${STORAGE_DIR} is already in your PATH`);
   }
 };
 
@@ -180,18 +180,20 @@ export const remove = async ({ all }: { all?: boolean }) => {
   
   if (existsSync(activeTerraformPath)) {
     try {
-      const activeContent = await readFile(activeTerraformPath);
-      // Find which terraform_ file matches the active terraform
+      const activeStats = statSync(activeTerraformPath);
+      // Find which terraform_ file matches the active terraform by comparing size and modification time
       for (const file of files) {
         const filePath = join(STORAGE_DIR, file);
-        const fileContent = await readFile(filePath);
-        if (Buffer.compare(activeContent, fileContent) === 0) {
+        const fileStats = statSync(filePath);
+        // Compare file size and mtime as a fast heuristic
+        if (activeStats.size === fileStats.size && 
+            Math.abs(activeStats.mtimeMs - fileStats.mtimeMs) < 1000) {
           activeVersion = file;
           break;
         }
       }
     } catch {
-      // Ignore errors if we can't read the file
+      // Ignore errors if we can't read the file stats
     }
   }
 

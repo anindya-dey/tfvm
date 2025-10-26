@@ -14,29 +14,33 @@ export interface TerraformExecutable {
   short: string;
 }
 
-// Helper to get platform identifier
-const getPlatformIdentifier = (): string | null => {
-  const platformName = platform();
-  
-  switch (platformName) {
-    case 'win32': return 'windows';
-    case 'darwin': return 'darwin';
-    case 'linux': return 'linux';
-    default: return null; // Unknown platform
-  }
-};
+// Helper to get platform and architecture identifiers
+interface SystemInfo {
+  platform: string | null;
+  arch: string | null;
+}
 
-// Helper to get architecture identifier
-const getArchIdentifier = (): string | null => {
+const getSystemInfo = (): SystemInfo => {
+  const platformName = platform();
   const architecture = arch();
   
-  switch (architecture) {
-    case 'x64': return 'amd64';
-    case 'arm64': return 'arm64';
-    case 'arm': return 'arm';
-    case 'ia32': return '386';
-    default: return null; // Unknown architecture
-  }
+  const platformMap: Record<string, string> = {
+    'win32': 'windows',
+    'darwin': 'darwin',
+    'linux': 'linux'
+  };
+  
+  const archMap: Record<string, string> = {
+    'x64': 'amd64',
+    'arm64': 'arm64',
+    'arm': 'arm',
+    'ia32': '386'
+  };
+  
+  return {
+    platform: platformMap[platformName] || null,
+    arch: archMap[architecture] || null
+  };
 };
 
 // Fetch HTML using native fetch
@@ -88,8 +92,7 @@ export const listTerraformExecutables = async (version: string): Promise<Terrafo
     const executables: TerraformExecutable[] = [];
     
     // Get current platform and architecture
-    const platformId = getPlatformIdentifier();
-    const archId = getArchIdentifier();
+    const { platform: platformId, arch: archId } = getSystemInfo();
     
     // If platform or arch is unknown, show all packages
     const showAllPackages = platformId === null || archId === null;
