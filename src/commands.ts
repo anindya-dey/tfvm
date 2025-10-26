@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, rmSync, mkdirSync, copyFileSync, chmodSync } from "fs";
+import { existsSync, readdirSync, rmSync, mkdirSync, copyFileSync, chmodSync, statSync } from "fs";
 import { appendFile, readFile } from "fs/promises";
 import { join } from "path";
 import { homedir } from "os";
@@ -80,9 +80,23 @@ const addToPath = async (): Promise<void> => {
 // Helper to get terraform files
 const getTerraformFiles = (): string[] => {
   if (!existsSync(STORAGE_DIR)) return [];
-  return readdirSync(STORAGE_DIR).filter(file => 
-    file.startsWith('terraform') && !file.includes('.')
-  );
+  return readdirSync(STORAGE_DIR).filter(file => {
+    if (!file.startsWith('terraform_')) return false;
+    
+    // Check if file has underscores (terraform_{version}_{os}_{arch} pattern)
+    const hasUnderscores = file.split('_').length >= 4;
+    if (!hasUnderscores) return false;
+    
+    // Check if file is executable
+    try {
+      const filePath = join(STORAGE_DIR, file);
+      const stats = statSync(filePath);
+      // Check if file has execute permission (owner, group, or others)
+      return (stats.mode & 0o111) !== 0;
+    } catch {
+      return false;
+    }
+  });
 };
 
 // Helper to handle download flow
@@ -153,24 +167,51 @@ export const remove = async ({ all }: { all?: boolean }) => {
     return;
   }
 
-  const files = readdirSync(STORAGE_DIR).filter(file => file.startsWith('terraform'));
+  const files = getTerraformFiles();
 
   if (files.length === 0) {
-    printInfo(`Storage directory is empty`);
+    printInfo(`No terraform versions found`);
     return;
+  }
+
+  // Check if there's a currently active terraform version
+  const activeTerraformPath = join(STORAGE_DIR, 'terraform');
+  let activeVersion: string | null = null;
+  
+  if (existsSync(activeTerraformPath)) {
+    try {
+      const activeContent = await readFile(activeTerraformPath);
+      // Find which terraform_ file matches the active terraform
+      for (const file of files) {
+        const filePath = join(STORAGE_DIR, file);
+        const fileContent = await readFile(filePath);
+        if (Buffer.compare(activeContent, fileContent) === 0) {
+          activeVersion = file;
+          break;
+        }
+      }
+    } catch {
+      // Ignore errors if we can't read the file
+    }
   }
 
   if (all) {
     const confirmed = await confirmRemoveAll(STORAGE_DIR);
     if (confirmed) {
-      files.forEach(file => {
-        rmSync(join(STORAGE_DIR, file), { force: true });
-        printSuccess(`Removed ${file}`);
-      });
-      printSuccess("All terraform versions removed!");
+      // Remove the entire .tfvm directory
+      rmSync(STORAGE_DIR, { recursive: true, force: true });
+      printSuccess("Cleaned up entire .tfvm directory!");
+      printInfo("All terraform versions and configurations have been removed");
     }
   } else {
     const selectedTerraformFile = await selectFileToRemove(files);
+    
+    if (activeVersion && selectedTerraformFile === activeVersion) {
+      printError(`Cannot remove ${selectedTerraformFile}: it is currently the active version`);
+      printInfo(`Switch to a different version first using 'tfvm use'`);
+      return;
+    }
+    
     rmSync(join(STORAGE_DIR, selectedTerraformFile), { force: true });
     printSuccess(`Removed ${selectedTerraformFile}`);
   }
@@ -188,17 +229,13 @@ export const use = async () => {
   printSuccess(`Terraform executables available at ${STORAGE_DIR}:`);
   const selectedTerraformFile = await listLocalTerraformFiles(files);
 
-  if (!existsSync(TFVM_PATH)) {
-    mkdirSync(TFVM_PATH, { recursive: true });
-  }
-
   const sourcePath = join(STORAGE_DIR, selectedTerraformFile);
-  const targetPath = join(TFVM_PATH, 'terraform');
+  const terraformPath = join(STORAGE_DIR, 'terraform');
   
-  copyFileSync(sourcePath, targetPath);
-  chmodSync(targetPath, '755');
+  copyFileSync(sourcePath, terraformPath);
+  chmodSync(terraformPath, '755');
   
-  printSuccess(`Set ${selectedTerraformFile} as default!`);
+  printSuccess(`Now using ${selectedTerraformFile} as 'terraform'!`);
   
   // Automatically add to PATH
   await addToPath();

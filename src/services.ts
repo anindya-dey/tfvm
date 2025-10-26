@@ -161,6 +161,16 @@ export const downloadTerraform = async (packageUrl: string, version: string): Pr
       await chmod(extractPath, 0o755);
     }
     
+    // Create a "terraform" symlink/copy for direct access
+    const baseName = basename(packageUrl, ".zip");
+    const sourcePath = join(STORAGE_DIR, baseName);
+    const terraformPath = join(STORAGE_DIR, "terraform");
+    
+    if (existsSync(sourcePath)) {
+      await writeFile(terraformPath, await readFile(sourcePath));
+      await chmod(terraformPath, 0o755);
+    }
+    
     await unlink(zipPath);
     printSuccess(`Successfully installed from ${fileName}!`);
   } catch (err: any) {
