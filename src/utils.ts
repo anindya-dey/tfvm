@@ -1,10 +1,30 @@
 import chalk from "chalk";
 
-// Print utilities
-export const printSuccess = (message: string) => console.log(chalk.greenBright(message));
-export const printError = (message: string) => console.log(chalk.redBright(message));
-export const printInfo = (message: string) => console.log(chalk.blueBright(message));
-export const printPlainText = (text: string) => console.log(text);
+// Consolidated print utility
+type PrintType = 'success' | 'error' | 'info' | 'plain';
+
+export const print = (message: string, type: PrintType = 'plain'): void => {
+  switch (type) {
+    case 'success':
+      console.log(chalk.greenBright(message));
+      break;
+    case 'error':
+      console.log(chalk.redBright(message));
+      break;
+    case 'info':
+      console.log(chalk.blueBright(message));
+      break;
+    case 'plain':
+    default:
+      console.log(message);
+  }
+};
+
+// Legacy exports for backward compatibility (can be removed later)
+export const printSuccess = (message: string) => print(message, 'success');
+export const printError = (message: string) => print(message, 'error');
+export const printInfo = (message: string) => print(message, 'info');
+export const printPlainText = (text: string) => print(text, 'plain');
 
 // Terraform link validation
 export const isTerraformLink = (linkHref: string | null | undefined): boolean => {

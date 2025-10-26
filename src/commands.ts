@@ -1,7 +1,9 @@
-import { existsSync, readdirSync, rmSync, mkdirSync, copyFileSync, chmodSync } from "fs";
+import { existsSync, readdirSync, rmSync, copyFileSync, chmodSync, statSync } from "fs";
+import { appendFile, readFile } from "fs/promises";
 import { join } from "path";
-import { TERRAFORM_RELEASE_REPO, STORAGE_DIR, TFVM_PATH } from "./config";
-import { printSuccess, printError, printInfo, printPlainText } from "./utils";
+import { homedir } from "os";
+import { TERRAFORM_RELEASE_REPO, STORAGE_DIR } from "./config";
+import { print } from "./utils";
 import { fetchTerraformVersions, listTerraformExecutables, downloadTerraform } from "./services";
 import { 
   selectVersion, 
@@ -13,49 +15,138 @@ import {
   selectFileToRemove 
 } from "./prompts";
 
-// Helper to get terraform files
+// Constants
+const SHELL_FILES = ['.bashrc', '.zshrc', '.profile', '.bash_profile'] as const;
+const TERRAFORM_BINARY = 'terraform';
+const TERRAFORM_PREFIX = 'terraform_';
+const MIN_VERSION_PARTS = 4; // terraform_{version}_{os}_{arch}
+const FILE_COMPARISON_THRESHOLD_MS = 1000;
+
+// Helpers
+const isPathInShellConfig = async (shellFile: string, pathToCheck: string): Promise<boolean> => {
+  try {
+    const content = await readFile(shellFile, 'utf-8');
+    return content.includes(pathToCheck);
+  } catch {
+    return false;
+  }
+};
+
 const getTerraformFiles = (): string[] => {
   if (!existsSync(STORAGE_DIR)) return [];
-  return readdirSync(STORAGE_DIR).filter(file => 
-    file.startsWith('terraform') && !file.includes('.')
-  );
+  
+  return readdirSync(STORAGE_DIR).filter(file => {
+    if (!file.startsWith(TERRAFORM_PREFIX)) return false;
+    if (file.split('_').length < MIN_VERSION_PARTS) return false;
+    
+    try {
+      const stats = statSync(join(STORAGE_DIR, file));
+      return (stats.mode & 0o111) !== 0; // Check executable permission
+    } catch {
+      return false;
+    }
+  });
 };
 
-// Helper to handle download flow
-const handleDownloadFlow = async (version: string) => {
+const getActiveVersion = (files: string[]): string | null => {
+  const activePath = join(STORAGE_DIR, TERRAFORM_BINARY);
+  if (!existsSync(activePath)) return null;
+  
+  try {
+    const activeStats = statSync(activePath);
+    
+    for (const file of files) {
+      const fileStats = statSync(join(STORAGE_DIR, file));
+      if (
+        activeStats.size === fileStats.size && 
+        Math.abs(activeStats.mtimeMs - fileStats.mtimeMs) < FILE_COMPARISON_THRESHOLD_MS
+      ) {
+        return file;
+      }
+    }
+  } catch {
+    // Ignore errors
+  }
+  
+  return null;
+};
+
+const addToPath = async (): Promise<void> => {
+  if (process.platform === 'win32') {
+    print(`To use terraform globally on Windows:`, 'info');
+    print(`1. Open System Properties > Environment Variables`, 'info');
+    print(`2. Add "${STORAGE_DIR}" to your PATH variable`, 'info');
+    print(`   OR run in PowerShell (Admin):`, 'info');
+    print(`   [Environment]::SetEnvironmentVariable("Path", $env:Path + ";${STORAGE_DIR}", "User")`, 'info');
+    return;
+  }
+  
+  const home = homedir();
+  const pathExport = `\n# Added by tfvm\nexport PATH="${STORAGE_DIR}:$PATH"\n`;
+  const shellPaths = SHELL_FILES.map(file => join(home, file)).filter(existsSync);
+  
+  let updated = false;
+  
+  for (const shellFile of shellPaths) {
+    if (await isPathInShellConfig(shellFile, STORAGE_DIR)) continue;
+    
+    try {
+      await appendFile(shellFile, pathExport);
+      print(`Added ${STORAGE_DIR} to ${shellFile}`, 'success');
+      updated = true;
+    } catch (error: any) {
+      print(`Failed to update ${shellFile}: ${error.message}`, 'error');
+    }
+  }
+  
+  const message = updated
+    ? `Restart your terminal or run: source ${process.platform === 'darwin' ? '~/.zshrc or ~/.bash_profile' : '~/.bashrc'}`
+    : `${STORAGE_DIR} is already in your PATH`;
+  
+  print(message, 'info');
+};
+
+const handleDownloadFlow = async (version: string): Promise<void> => {
   const executables = await listTerraformExecutables(version);
-  const selectedPackageUrl = await selectPackageUrl(executables);
+  
+  const selectedPackageUrl = executables.length === 1
+    ? (print(`Auto-detected package: ${executables[0].name}`, 'info'), executables[0].value)
+    : await selectPackageUrl(executables);
+  
   await downloadTerraform(selectedPackageUrl, version);
+  await addToPath();
 };
 
-export const list = async ({ remote }: { remote?: boolean }) => {
+// Exported commands
+export const list = async ({ remote }: { remote?: boolean } = {}): Promise<void> => {
   if (remote) {
     try {
       const versions = await fetchTerraformVersions();
-      printSuccess(`Terraform versions available at ${TERRAFORM_RELEASE_REPO}:`);
+      print(`Terraform versions available at ${TERRAFORM_RELEASE_REPO}:`, 'success');
       
       const selectedVersion = await listVersion(versions, "Select a version to download:");
       const wantToDownload = await confirmDownload(selectedVersion, "terraform");
       
       if (wantToDownload) await handleDownloadFlow(selectedVersion);
     } catch (error: any) {
-      printError(error.message);
+      print(error.message, 'error');
     }
-  } else {
-    const files = getTerraformFiles();
-    
-    if (files.length === 0) {
-      printError(`No terraform executables found at ${STORAGE_DIR}`);
-      printInfo(`Use 'tfvm download' to install terraform versions`);
-      return;
-    }
-    
-    printSuccess(`Terraform executables at ${STORAGE_DIR}:`);
-    files.forEach(file => printPlainText(`• ${file}`));
+    return;
   }
+  
+  const files = getTerraformFiles();
+  
+  if (files.length === 0) {
+    print(`No terraform executables found at ${STORAGE_DIR}`, 'error');
+    print(`Use 'tfvm download' to install terraform versions`, 'info');
+    return;
+  }
+  
+  print(`Terraform executables at ${STORAGE_DIR}:`, 'success');
+  files.forEach(file => print(`• ${file}`, 'plain'));
 };
 
-export const download = async (version?: string) => {
+export const download = async (version?: string): Promise<void> => {
   try {
     if (version) {
       await handleDownloadFlow(version);
@@ -65,70 +156,73 @@ export const download = async (version?: string) => {
       await handleDownloadFlow(selectedVersion);
     }
   } catch (error: any) {
-    printError(error.message);
+    print(error.message, 'error');
   }
 };
 
-export const remove = async ({ all }: { all?: boolean }) => {
+export const remove = async ({ all }: { all?: boolean } = {}): Promise<void> => {
   if (!existsSync(STORAGE_DIR)) {
-    printError(`Storage directory ${STORAGE_DIR} does not exist`);
+    print(`Storage directory ${STORAGE_DIR} does not exist`, 'error');
     return;
   }
 
-  const files = readdirSync(STORAGE_DIR).filter(file => file.startsWith('terraform'));
+  const files = getTerraformFiles();
 
   if (files.length === 0) {
-    printInfo(`Storage directory is empty`);
+    print(`No terraform versions found`, 'info');
     return;
   }
 
   if (all) {
     const confirmed = await confirmRemoveAll(STORAGE_DIR);
     if (confirmed) {
-      files.forEach(file => {
-        rmSync(join(STORAGE_DIR, file), { force: true });
-        printSuccess(`Removed ${file}`);
-      });
-      printSuccess("All terraform versions removed!");
+      rmSync(STORAGE_DIR, { recursive: true, force: true });
+      print("Cleaned up entire .tfvm directory!", 'success');
+      print("All terraform versions and configurations have been removed", 'info');
     }
-  } else {
-    const selectedTerraformFile = await selectFileToRemove(files);
-    rmSync(join(STORAGE_DIR, selectedTerraformFile), { force: true });
-    printSuccess(`Removed ${selectedTerraformFile}`);
+    return;
   }
+  
+  const selectedFile = await selectFileToRemove(files);
+  const activeVersion = getActiveVersion(files);
+  
+  if (activeVersion === selectedFile) {
+    print(`Cannot remove ${selectedFile}: it is currently the active version`, 'error');
+    print(`Switch to a different version first using 'tfvm use'`, 'info');
+    return;
+  }
+  
+  rmSync(join(STORAGE_DIR, selectedFile), { force: true });
+  print(`Removed ${selectedFile}`, 'success');
 };
 
-export const use = async () => {
+export const use = async (): Promise<void> => {
   const files = getTerraformFiles();
 
   if (files.length === 0) {
-    printError(`No terraform executables at ${STORAGE_DIR}`);
-    printInfo(`Use 'tfvm download' to install terraform versions`);
+    print(`No terraform executables at ${STORAGE_DIR}`, 'error');
+    print(`Use 'tfvm download' to install terraform versions`, 'info');
     return;
   }
 
-  printSuccess(`Terraform executables available at ${STORAGE_DIR}:`);
-  const selectedTerraformFile = await listLocalTerraformFiles(files);
+  print(`Terraform executables available at ${STORAGE_DIR}:`, 'success');
+  const selectedFile = await listLocalTerraformFiles(files);
 
-  if (!existsSync(TFVM_PATH)) {
-    mkdirSync(TFVM_PATH, { recursive: true });
-  }
-
-  const sourcePath = join(STORAGE_DIR, selectedTerraformFile);
-  const targetPath = join(TFVM_PATH, 'terraform');
+  const sourcePath = join(STORAGE_DIR, selectedFile);
+  const terraformPath = join(STORAGE_DIR, TERRAFORM_BINARY);
   
-  copyFileSync(sourcePath, targetPath);
-  chmodSync(targetPath, '755');
+  copyFileSync(sourcePath, terraformPath);
+  chmodSync(terraformPath, '755');
   
-  printSuccess(`Set ${selectedTerraformFile} as default!`);
-  printInfo(`Add ${TFVM_PATH} to your PATH to use terraform`);
+  print(`Now using ${selectedFile} as 'terraform'!`, 'success');
+  await addToPath();
 };
 
-export const dir = () => {
+export const dir = (): void => {
   if (existsSync(STORAGE_DIR)) {
-    printSuccess(`Storage directory: ${STORAGE_DIR}`);
+    print(`Storage directory: ${STORAGE_DIR}`, 'success');
   } else {
-    printError(`Storage directory does not exist`);
-    printInfo(`It will be created automatically when you download terraform`);
+    print(`Storage directory does not exist`, 'error');
+    print(`It will be created automatically when you download terraform`, 'info');
   }
 };

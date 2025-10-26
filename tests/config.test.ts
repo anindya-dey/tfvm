@@ -1,5 +1,5 @@
 import { describe, test, expect } from "bun:test";
-import { TERRAFORM_RELEASE_REPO, STORAGE_DIR, TFVM_PATH } from "../src/config";
+import { TERRAFORM_RELEASE_REPO, STORAGE_DIR } from "../src/config";
 import { homedir } from "os";
 import { join } from "path";
 
@@ -13,9 +13,5 @@ describe("Config", () => {
     expect(STORAGE_DIR).toStartWith(homedir());
     expect(STORAGE_DIR).toInclude(".tfvm");
     expect(STORAGE_DIR).toBe(join(homedir(), ".tfvm"));
-  });
-
-  test("should have TFVM_PATH equal to STORAGE_DIR", () => {
-    expect(TFVM_PATH).toBe(STORAGE_DIR);
   });
 });
