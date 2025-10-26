@@ -1,3 +1,9 @@
+# Build output
+dist/
+.dist/
+build/
+*.tsbuildinfo
+
 # Logs
 logs
 *.log
@@ -37,15 +43,26 @@ bower_components
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
 
-# Dependency directories
+# Package managers
 node_modules/
 jspm_packages/
+bun.lockb
+yarn.lock
+package-lock.json
+pnpm-lock.yaml
 
 # TypeScript v1 declaration files
 typings/
 
 # TypeScript cache
 *.tsbuildinfo
+
+# Build tools cache
+.cache/
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
 
 # Optional npm cache directory
 .npm
@@ -58,6 +75,15 @@ typings/
 .rts2_cache_cjs/
 .rts2_cache_es/
 .rts2_cache_umd/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
 # Optional REPL history
 .node_repl_history
