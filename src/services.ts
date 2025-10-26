@@ -15,19 +15,19 @@ export interface TerraformExecutable {
 }
 
 // Helper to get platform identifier
-const getPlatformIdentifier = (): string => {
+const getPlatformIdentifier = (): string | null => {
   const platformName = platform();
   
   switch (platformName) {
     case 'win32': return 'windows';
     case 'darwin': return 'darwin';
     case 'linux': return 'linux';
-    default: return 'linux';
+    default: return null; // Unknown platform
   }
 };
 
 // Helper to get architecture identifier
-const getArchIdentifier = (): string => {
+const getArchIdentifier = (): string | null => {
   const architecture = arch();
   
   switch (architecture) {
@@ -35,7 +35,7 @@ const getArchIdentifier = (): string => {
     case 'arm64': return 'arm64';
     case 'arm': return 'arm';
     case 'ia32': return '386';
-    default: return 'amd64';
+    default: return null; // Unknown architecture
   }
 };
 
@@ -90,22 +90,32 @@ export const listTerraformExecutables = async (version: string): Promise<Terrafo
     // Get current platform and architecture
     const platformId = getPlatformIdentifier();
     const archId = getArchIdentifier();
-    const targetPattern = `${platformId}_${archId}`;
+    
+    // If platform or arch is unknown, show all packages
+    const showAllPackages = platformId === null || archId === null;
+    
+    if (showAllPackages) {
+      printInfo(`Unable to auto-detect platform (${platform()}) or architecture (${arch()})`);
+      printInfo(`Showing all available packages for manual selection...`);
+    }
+    
+    const targetPattern = showAllPackages ? null : `${platformId}_${archId}`;
 
     const links = root.querySelectorAll("a");
     links.forEach((link) => {
       const href = link.getAttribute("href");
       if (href && isTerraformLink(href) && isZipPackage(href)) {
         const name = basename(href);
-        // Filter by current platform and architecture
-        if (name.includes(targetPattern)) {
+        
+        // If showing all packages or package matches current platform/arch
+        if (showAllPackages || (targetPattern && name.includes(targetPattern))) {
           executables.push({ name, value: href, short: name });
         }
       }
     });
 
     if (executables.length === 0) {
-      throw new Error(`No Terraform package found for ${platformId}_${archId}. Platform may not be supported.`);
+      throw new Error(`No Terraform packages found for version ${version}`);
     }
 
     return executables;
