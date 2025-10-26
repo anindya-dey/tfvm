@@ -1,6 +1,7 @@
 import { writeFile, chmod, unlink, mkdir, readFile } from "fs/promises";
 import { existsSync, createWriteStream } from "fs";
 import { basename, join } from "path";
+import { arch, platform } from "os";
 import { pipeline } from "stream/promises";
 import { parse } from "node-html-parser";
 import { unzipSync } from "fflate";
@@ -12,6 +13,31 @@ export interface TerraformExecutable {
   value: string;
   short: string;
 }
+
+// Helper to get platform identifier
+const getPlatformIdentifier = (): string => {
+  const platformName = platform();
+  
+  switch (platformName) {
+    case 'win32': return 'windows';
+    case 'darwin': return 'darwin';
+    case 'linux': return 'linux';
+    default: return 'linux';
+  }
+};
+
+// Helper to get architecture identifier
+const getArchIdentifier = (): string => {
+  const architecture = arch();
+  
+  switch (architecture) {
+    case 'x64': return 'amd64';
+    case 'arm64': return 'arm64';
+    case 'arm': return 'arm';
+    case 'ia32': return '386';
+    default: return 'amd64';
+  }
+};
 
 // Fetch HTML using native fetch
 const fetchUrl = async (url: string): Promise<string> => {
@@ -60,15 +86,27 @@ export const listTerraformExecutables = async (version: string): Promise<Terrafo
     const html = await fetchUrl(`${TERRAFORM_RELEASE_REPO}/${version}/`);
     const root = parse(html);
     const executables: TerraformExecutable[] = [];
+    
+    // Get current platform and architecture
+    const platformId = getPlatformIdentifier();
+    const archId = getArchIdentifier();
+    const targetPattern = `${platformId}_${archId}`;
 
     const links = root.querySelectorAll("a");
     links.forEach((link) => {
       const href = link.getAttribute("href");
       if (href && isTerraformLink(href) && isZipPackage(href)) {
         const name = basename(href);
-        executables.push({ name, value: href, short: name });
+        // Filter by current platform and architecture
+        if (name.includes(targetPattern)) {
+          executables.push({ name, value: href, short: name });
+        }
       }
     });
+
+    if (executables.length === 0) {
+      throw new Error(`No Terraform package found for ${platformId}_${archId}. Platform may not be supported.`);
+    }
 
     return executables;
   } catch (err: any) {
