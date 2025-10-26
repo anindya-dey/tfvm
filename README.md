@@ -2,7 +2,7 @@
 
 ### A modern, fast CLI tool to manage multiple Terraform versions on your system
 
-[![npm version](https://img.shields.io/npm/v/tfvm?color=blue&label=version&style=for-the-badge)](https://www.npmjs.com/package/tfvm) [![Total Downloads](https://img.shields.io/npm/dt/tfvm?label=total%20downloads&style=for-the-badge)](https://www.npmjs.com/package/tfvm) [![license](https://img.shields.io/npm/l/tfvm?color=lightblue&style=for-the-badge)](https://www.npmjs.com/package/tfvm) [![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen?style=for-the-badge)](https://nodejs.org) [![CI](https://img.shields.io/github/actions/workflow/status/anindya-dey/tfvm/run-unit-tests.yml?style=for-the-badge&label=CI)](https://github.com/anindya-dey/tfvm/actions)
+[![npm version](https://img.shields.io/npm/v/tfvm?color=blue&label=version&style=for-the-badge)](https://www.npmjs.com/package/tfvm) [![Total Downloads](https://img.shields.io/npm/dt/tfvm?label=total%20downloads&style=for-the-badge)](https://www.npmjs.com/package/tfvm) [![license](https://img.shields.io/npm/l/tfvm?color=lightblue&style=for-the-badge)](https://www.npmjs.com/package/tfvm) [![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen?style=for-the-badge)](https://nodejs.org) [![CI](https://img.shields.io/github/actions/workflow/status/anindya-dey/tfvm/ci.yml?style=for-the-badge&label=CI)](https://github.com/anindya-dey/tfvm/actions)
 
 > **Never worry about Terraform version conflicts again!** 🚀  
 > Seamlessly switch between Terraform versions for different projects, just like `nvm` for Node.js.
