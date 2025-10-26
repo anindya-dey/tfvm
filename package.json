@@ -46,7 +46,7 @@
     "clean": "rm -rf dist",
     "prepublishOnly": "bun run clean && bun run test && bun run build",
     "lint": "tsc --noEmit",
-    "version": "bun run build && git add -A dist",
+    "version": "bun run build",
     "postversion": "git push && git push --tags",
     "release:patch": "npm version patch -m 'chore(release): v%s'",
     "release:minor": "npm version minor -m 'chore(release): v%s'",
