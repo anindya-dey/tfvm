@@ -45,7 +45,16 @@
     "test:watch": "bun test --watch",
     "clean": "rm -rf dist",
     "prepublishOnly": "bun run clean && bun run test && bun run build",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "version": "bun run build && git add -A dist",
+    "postversion": "git push && git push --tags",
+    "release:patch": "npm version patch -m 'chore(release): v%s'",
+    "release:minor": "npm version minor -m 'chore(release): v%s'",
+    "release:major": "npm version major -m 'chore(release): v%s'",
+    "release:beta": "npm version prerelease --preid=beta -m 'chore(release): v%s'",
+    "release:dry": "npm version --dry-run",
+    "changelog": "./scripts/generate-changelog.sh",
+    "release": "./scripts/release.sh"
   },
   "dependencies": {
     "@clack/prompts": "^0.11.0",

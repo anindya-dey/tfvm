@@ -450,6 +450,13 @@ We welcome contributions! TFVM is open source and community-driven.
 6. **🚀 Push** to the branch (`git push origin feature/amazing-feature`)
 7. **📬 Open** a Pull Request
 
+### 📚 Documentation
+
+For detailed guides on contributing and releasing:
+
+- **[Versioning Guide](docs/VERSIONING.md)** - Semantic versioning conventions and commit message format
+- **[Tagging & Release Guide](docs/TAGGING_GUIDE.md)** - How to create releases and publish to npm
+
 ### Development Setup
 
 ```bash
