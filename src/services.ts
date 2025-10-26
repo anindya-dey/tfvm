@@ -6,7 +6,7 @@ import { pipeline } from "stream/promises";
 import { parse } from "node-html-parser";
 import { unzipSync } from "fflate";
 import { TERRAFORM_RELEASE_REPO, STORAGE_DIR } from "./config";
-import { isTerraformLink, extractTerraformVersion, isZipPackage, printInfo, printSuccess } from "./utils";
+import { isTerraformLink, extractTerraformVersion, isZipPackage, print } from "./utils";
 
 export interface TerraformExecutable {
   name: string;
@@ -98,8 +98,8 @@ export const listTerraformExecutables = async (version: string): Promise<Terrafo
     const showAllPackages = platformId === null || archId === null;
     
     if (showAllPackages) {
-      printInfo(`Unable to auto-detect platform (${platform()}) or architecture (${arch()})`);
-      printInfo(`Showing all available packages for manual selection...`);
+      print(`Unable to auto-detect platform (${platform()}) or architecture (${arch()})`, 'info');
+      print(`Showing all available packages for manual selection...`, 'info');
     }
     
     const targetPattern = showAllPackages ? null : `${platformId}_${archId}`;
@@ -135,10 +135,10 @@ export const listTerraformExecutables = async (version: string): Promise<Terrafo
 
 export const downloadTerraform = async (packageUrl: string, version: string): Promise<void> => {
   const fileName = basename(packageUrl);
-  printInfo(`Downloading and extracting "${fileName}"...`);
+  print(`Downloading and extracting "${fileName}"...`, 'info');
 
   if (!existsSync(STORAGE_DIR)) {
-    printInfo(`Creating storage directory: ${STORAGE_DIR}`);
+    print(`Creating storage directory: ${STORAGE_DIR}`, 'info');
     await mkdir(STORAGE_DIR, { recursive: true });
   }
 
@@ -175,7 +175,7 @@ export const downloadTerraform = async (packageUrl: string, version: string): Pr
     }
     
     await unlink(zipPath);
-    printSuccess(`Successfully installed from ${fileName}!`);
+    print(`Successfully installed from ${fileName}!`, 'success');
   } catch (err: any) {
     throw new Error(`Download failed: ${err.message}`);
   }
