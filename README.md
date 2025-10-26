@@ -1,146 +1,532 @@
-# Terraform Version Manager
+# Terraform Version Manager (TFVM)
 
-### A NodeJS-based CLI tool to manage terraform versions on a system
+### A modern, fast CLI tool to manage multiple Terraform versions on your system
 
-<br />
+[![npm version](https://img.shields.io/npm/v/tfvm?color=blue&label=version&style=for-the-badge)](https://www.npmjs.com/package/tfvm) [![Total Downloads](https://img.shields.io/npm/dt/tfvm?label=total%20downloads&style=for-the-badge)](https://www.npmjs.com/package/tfvm) [![license](https://img.shields.io/npm/l/tfvm?color=lightblue&style=for-the-badge)](https://www.npmjs.com/package/tfvm) [![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen?style=for-the-badge)](https://nodejs.org) [![CI](https://img.shields.io/github/actions/workflow/status/anindya-dey/tfvm/run-unit-tests.yml?style=for-the-badge&label=CI)](https://github.com/anindya-dey/tfvm/actions)
 
-[![npm version](https://img.shields.io/npm/v/tfvm?color=blue&label=version&style=for-the-badge)](https://www.npmjs.com/package/tfvm) [![Total Downloads](https://img.shields.io/npm/dt/tfvm?label=total%20downloads&style=for-the-badge)](https://www.npmjs.com/package/tfvm) [![license](https://img.shields.io/npm/l/tfvm?color=lightblue&style=for-the-badge)](https://www.npmjs.com/package/tfvm)
+> **Never worry about Terraform version conflicts again!** 🚀  
+> Seamlessly switch between Terraform versions for different projects, just like `nvm` for Node.js.
 
-<br />
+## 🎯 Why TFVM?
 
-Install it globally to manage all the terraform versions
+- 🏢 **Multiple Projects?** Different projects often require different Terraform versions
+- 🔄 **Legacy Support?** Need to maintain older infrastructure with specific Terraform versions  
+- 🆕 **Latest Features?** Want to try new Terraform features without breaking existing workflows
+- 👥 **Team Consistency?** Ensure your entire team uses the same Terraform version
+- 🛡️ **Risk Mitigation?** Test upgrades safely before applying to production
+
+**TFVM solves all of this with simple, intuitive commands.**
+
+## ✨ What's New in v2.0
+
+- ⚡ **Faster & Lighter** - Reduced bundle size to ~9KB (98% smaller!)
+- 🔄 **Auto-Update Check** - Get notified when new versions are available
+- 🌐 **Modern APIs** - Built with Fetch API for Node.js 18+ compatibility
+- 🧪 **Better Testing** - Comprehensive test suite with Bun test runner
+- 📦 **Fewer Dependencies** - Streamlined to essential packages only
+- 🚀 **Improved Performance** - Optimized async operations throughout
+
+## 🚀 Quick Start
+
+**Requirements:** Node.js >= 18.0.0
+
+Install globally via npm:
 
 ```sh
-$ npm install -g tfvm
+npm install -g tfvm
 ```
 
-![default](https://user-images.githubusercontent.com/30517208/215016872-45b400f6-5738-4404-876e-f886f6e77fdb.gif)
+Or with other package managers:
+```sh
+# Using yarn
+yarn global add tfvm
 
-### Available Commands
+# Using pnpm  
+pnpm add -g tfvm
 
----
+# Using bun
+bun add -g tfvm
+```
 
-#### `list | ls [--remote | -r]`
+![default](assets/gifs/default.gif)
 
-- Use this command to list the downloaded versions of terraform
+## 🎬 Quick Demo
 
-  ```sh
-  $ tfvm list # gets all the locally available terraform executables
+```bash
+# 1. Install a specific Terraform version
+$ tfvm download 1.6.0
 
-  # --- OR ---
+# 2. Switch to it  
+$ tfvm use
 
-  $ tfvm ls
-  ```
+# 3. Verify it's active
+$ terraform version
+Terraform v1.6.0
 
-  ![ls](https://user-images.githubusercontent.com/30517208/215016919-d4d38647-bc18-48ce-961a-9a27f088e349.gif)
+# 4. List all your versions
+$ tfvm list
+```
 
-- Append `--remote` or `-r` with `list` to get a list of all available releases from [Terraform](https://releases.hashicorp.com/terraform)
+## ✨ Features
 
-  ```sh
-  $ tfvm list --remote # displays the available releases from Terraform's website
+- 🔄 **Easy version switching** - Switch between Terraform versions with one command
+- 📦 **Automatic downloads** - Download any Terraform version from HashiCorp's official releases
+- 🎯 **Interactive prompts** - User-friendly selection menus and confirmations
+- 🗂️ **Local management** - Keep multiple versions locally and switch as needed
+- 🖥️ **Cross-platform** - Works on Windows, macOS, and Linux
+- ⚡ **Fast & lightweight** - Optimized bundle size (~9KB) with minimal dependencies
+- 🔧 **Configurable** - Customize storage directory via configuration files
+- 🛡️ **Safe operations** - Confirmation prompts for destructive actions
+- 🔍 **Version discovery** - Browse all available Terraform releases
+- 📊 **Smart filtering** - Automatically handles platform-specific downloads
+- 🔔 **Update notifications** - Get notified when new TFVM versions are available
 
-  # --- OR ---
+## 🚀 Common Use Cases
 
-  $ tfvm ls -r
-  ```
+<details>
+<summary><b>🏗️ Project-specific Terraform versions</b></summary>
 
-  ![ls-remote](https://user-images.githubusercontent.com/30517208/215016945-d68d2db7-f3eb-47fd-931b-4db05ee0ab7b.gif)
+```bash
+# For legacy project requiring Terraform 1.4.x
+cd legacy-infrastructure
+tfvm use  # Select 1.4.6
 
-- If you do not have any terraform executables on your path, you would see an error, like so:
+# For new project using latest features  
+cd new-infrastructure
+tfvm use  # Select 1.6.0
+```
+</details>
 
-  ![ls-when-empty](https://user-images.githubusercontent.com/30517208/215017052-ddce48bc-a501-4b91-bc03-20dd430f3344.gif)
+<details>
+<summary><b>🔬 Testing Terraform upgrades</b></summary>
 
----
+```bash
+# Download the new version
+tfvm download 1.6.0
 
-#### `download | d [version]`
+# Test with new version
+tfvm use  # Select 1.6.0
+terraform plan
 
-- This will present a list of available versions, and then a list of releases available for that version from terraform. Choose one with up/down arrow and hit `ENTER` to download it.
+# Rollback if issues found
+tfvm use  # Select your stable version
+```
+</details>
 
-  ```sh
-  $ tfvm download
+<details>
+<summary><b>👥 Team synchronization</b></summary>
 
-  # --- OR ---
+```bash
+# Team lead shares the version
+echo "Team is using Terraform 1.5.7"
 
-  $ tfvm d
-  ```
+# Everyone downloads the same version
+tfvm download 1.5.7
+tfvm use  # Select 1.5.7
 
-  ![download](https://user-images.githubusercontent.com/30517208/215017148-f18bb0a4-cf7f-45a4-9e68-b33d8d46beba.gif)
+# Verify consistency
+terraform version
+```
+</details>
 
-- Optionally, a `version` can be appended to this command which would directly present a list of releases, associated to this version:
+## 📋 Available Commands
 
-  ```sh
-  $ tfvm download 1.3.1
+### `tfvm list` | `tfvm ls` 
 
-  # --- OR ---
+List locally downloaded Terraform versions or browse remote versions.
 
-  $ tfvm d 1.3.1
-  ```
+**Local versions:**
+```sh
+tfvm list    # Show all locally installed versions
+tfvm ls      # Short alias
+```
 
-  ![download-version](https://user-images.githubusercontent.com/30517208/215017241-014aba01-a4b3-4b36-9f01-d7eb0ddf785e.gif)
+![ls](assets/gifs/ls.gif)
 
----
+**Remote versions:**
+```sh
+tfvm list --remote    # Browse all available versions from HashiCorp
+tfvm ls -r           # Short alias with flag
+```
 
-#### `remove | rm [--all | -a]`
+![ls-remote](assets/gifs/ls-remote.gif)
 
-- Use this to remove/delete a particular terraform executable or all terraform executables.
+**No versions installed:**
 
-  ```sh
-  $ tfvm remove # to remove a particular terraform executable
-
-  # --- OR ---
-
-  $ tfvm rm
-  ```
-
-  ![remove](https://user-images.githubusercontent.com/30517208/215017300-4b4e0290-b23c-4944-b673-ce176f56bfb9.gif)
-
-- Use `--all` or `-a` option to remove all the terraform executables.
-
-  ```sh
-  $ tfvm remove --all # to remove all the terraform executables
-
-  # --- OR ---
-
-  $ tfvm rm -a
-  ```
-
-  ![remove-all](https://user-images.githubusercontent.com/30517208/215017334-0bbe541a-dbcf-4059-a909-dc90d4f5ba99.gif)
-
----
-
-#### `use`
-
-- This command will present a list of all the locally available terraform executables. Once a particular executable is selected, it would be set as default and made available to the user via the `terraform` commands in the terminal.
-
-  ```sh
-  $ tfvm use # select a terraform executable as default, which can be used via 'terraform' command
-  ```
-
-  ![use](https://user-images.githubusercontent.com/30517208/215017404-dc951a39-ffc4-4161-9ffa-914a04c2589a.gif)
-
-> NOTE: User might have to perform a one-time update of their PATH variable to include the path indicated by this command.
-
----
-
-#### `dir`
-
-- This command shows the directory where all the terraform executables are stored locally. The default path is the `$USER/terraform` directory.
-
-  ```sh
-  $ tfvm dir # shows the directory where all the terraform executables are stored
-  ```
-
-  ![dir](https://user-images.githubusercontent.com/30517208/215017477-b76626fc-bca8-4032-9c36-fa5a4a8f12b9.gif)
-
----
-
-> **NOTES:**
->
-> 1. Currently, platform specfic releases are not filtered out when executing `tfvm list --remote` or `tfvm download [version]` command. User needs to make sure that they are downloading the right release for their system.
-> 2. Chalk v4.1.2 is used as it supports typescript; Chalk >= v5 is purely ESM.
+![ls-when-empty](assets/gifs/ls-when-empty.gif)
 
 ---
 
-⭐ _This project is inspired by the [nvm project](https://github.com/nvm-sh/nvm)_ 😍
+### `tfvm download` | `tfvm d`
 
-⭐ _I created these beautiful gifs by using [terminalizer](https://www.npmjs.com/package/terminalizer)_ 😍
+Download and install Terraform versions from HashiCorp's official releases.
+
+**Interactive download:**
+```sh
+tfvm download    # Browse and select from all available versions
+tfvm d          # Short alias
+```
+
+![download](assets/gifs/download.gif)
+
+**Version-specific download:**
+```sh
+tfvm download 1.6.0    # Download specific version releases
+tfvm d 1.6.0          # Short alias
+```
+
+![download-version](assets/gifs/download-version.gif)
+
+---
+
+### `tfvm remove` | `tfvm rm`
+
+Remove installed Terraform versions from your system.
+
+**Remove specific version:**
+```sh
+tfvm remove    # Select which version to remove
+tfvm rm       # Short alias
+```
+
+![remove](assets/gifs/remove.gif)
+
+**Remove all versions:**
+```sh
+tfvm remove --all    # Remove all installed versions
+tfvm rm -a          # Short alias with flag
+```
+
+![remove-all](assets/gifs/remove-all.gif)
+
+---
+
+### `tfvm use`
+
+Set a specific Terraform version as the default system version.
+
+```sh
+tfvm use    # Select from installed versions to set as default
+```
+
+![use](assets/gifs/use.gif)
+
+> **💡 Note:** You may need to add the TFVM directory to your PATH environment variable. The `tfvm dir` command shows the exact path to add.
+
+---
+
+### `tfvm dir`
+
+Display the directory where Terraform executables are stored.
+
+```sh
+tfvm dir    # Shows storage directory (default: ~/.tfvm)
+```
+
+![dir](assets/gifs/dir.gif)
+
+## 🔧 Configuration
+
+TFVM can be configured using RC files. Create a `.tfvmrc` file in your home directory:
+
+```json
+{
+  "TERRAFORM_RELEASE_REPO": "https://releases.hashicorp.com/terraform",
+  "STORAGE_DIR": "/custom/path/to/terraform/versions",
+  "TFVM_PATH": "/custom/path/to/terraform/versions"
+}
+```
+
+### Environment Variables
+
+You can also use environment variables for configuration:
+
+```bash
+export TFVM_STORAGE_DIR="/opt/terraform-versions"
+export TFVM_PATH="/opt/terraform-versions"
+```
+
+### Advanced Configuration
+
+<details>
+<summary><b>Custom Release Repository</b></summary>
+
+```json
+{
+  "TERRAFORM_RELEASE_REPO": "https://your-custom-mirror.com/terraform"
+}
+```
+</details>
+
+<details>
+<summary><b>Corporate Environment Setup</b></summary>
+
+```bash
+# Set custom paths for corporate environments
+export TFVM_STORAGE_DIR="/shared/tools/terraform"
+export TFVM_PATH="/shared/tools/terraform"
+
+# Or create a system-wide config
+sudo mkdir -p /etc/tfvm
+echo '{"STORAGE_DIR": "/shared/tools/terraform"}' | sudo tee /etc/tfvm/config.json
+```
+</details>
+
+## 🛠️ Development
+
+This project is built with modern tools for optimal performance:
+
+- **Runtime** - Node.js 18+ (for production) / Bun (for development)
+- **TypeScript** - Type-safe development with ESNext features
+- **Bun** - Fast bundling and testing
+- **Modern APIs** - Fetch API for HTTP requests (Node.js 18+)
+- **Modern Dependencies**:
+  - `citty` - Modern lightweight CLI framework
+  - `@clack/prompts` - Beautiful interactive prompts
+  - `node-html-parser` - Fast HTML parsing
+  - `fflate` - Fast ZIP compression
+  - `chalk` v4 - Terminal string styling (CommonJS compatible)
+
+### Building from source
+
+```sh
+# Clone the repository
+git clone https://github.com/anindya-dey/tfvm.git
+cd tfvm
+
+# Install dependencies with Bun (recommended)
+bun install
+
+# Or use npm/pnpm/yarn
+npm install
+
+# Build the project (creates Node.js-compatible bundle)
+bun run build
+
+# Run tests
+bun test
+
+# Run tests with coverage
+bun run test:coverage
+
+# Type check
+bun run lint
+
+# Link for local development
+npm link
+```
+
+### Tech Stack Details
+
+**Development:**
+- Built with Bun for fast development experience
+- TypeScript with strict mode enabled
+- ES modules in source code
+- Comprehensive test suite using Bun's test runner
+- CI/CD with GitHub Actions testing Node.js 18, 20, and 22
+
+**Production:**
+- Bundled to CommonJS for broad Node.js compatibility
+- Minified output (~11KB)
+- Node.js 18+ required (uses native Fetch API)
+- Zero TypeScript runtime dependencies
+- Modern, lightweight dependencies
+
+## 📁 Storage Structure
+
+TFVM organizes Terraform versions in your home directory:
+
+```
+~/.tfvm/
+├── terraform_1.5.0      # Terraform v1.5.0 executable
+├── terraform_1.6.0      # Terraform v1.6.0 executable  
+├── terraform_1.7.0      # Terraform v1.7.0 executable
+├── terraform            # Symlink to currently active version
+└── .version-check       # Update check cache (auto-managed)
+```
+
+## 🔍 Troubleshooting
+
+<details>
+<summary><b>❓ Command not found after installation</b></summary>
+
+**Problem:** `tfvm: command not found`
+
+**Solutions:**
+1. Ensure `~/.tfvm` is in your PATH environment variable
+2. Run `tfvm dir` to see the exact path to add
+3. Restart your terminal/shell
+4. For global npm installs, check `npm config get prefix`
+
+```bash
+# Add to your shell profile (.bashrc, .zshrc, etc.)
+export PATH="$HOME/.tfvm:$PATH"
+```
+</details>
+
+<details>
+<summary><b>🌐 Network issues during download</b></summary>
+
+**Problem:** Downloads fail or timeout
+
+**Solutions:**
+1. Check internet connectivity
+2. Verify access to `https://releases.hashicorp.com`
+3. Check if you're behind a corporate firewall
+4. Try using a VPN or different network
+
+```bash
+# Test connectivity
+curl -I https://releases.hashicorp.com/terraform/
+```
+</details>
+
+<details>
+<summary><b>🔐 Permission errors</b></summary>
+
+**Problem:** Permission denied errors
+
+**Solutions:**
+1. Ensure write permissions to home directory
+2. On Unix systems, make executables executable
+3. Check file ownership
+4. Avoid using `sudo` with tfvm
+
+```bash
+# Fix permissions on Unix systems
+chmod +x ~/.tfvm/terraform_*
+chown -R $USER:$USER ~/.tfvm/
+```
+</details>
+
+<details>
+<summary><b>🔄 Terraform version not switching</b></summary>
+
+**Problem:** `terraform version` shows wrong version after `tfvm use`
+
+**Solutions:**
+1. Check if PATH includes TFVM directory first
+2. Restart terminal session
+3. Verify no other Terraform installations override
+4. Check for shell aliases
+
+```bash
+# Debug PATH order
+echo $PATH | tr ':' '\n' | grep -E "(tfvm|terraform)"
+
+# Check which terraform binary is being used
+which terraform
+```
+</details>
+
+<details>
+<summary><b>🗂️ Storage directory issues</b></summary>
+
+**Problem:** Can't find downloaded versions
+
+**Solutions:**
+1. Run `tfvm dir` to see current storage location
+2. Check if custom config is overriding default path
+3. Verify directory permissions
+
+```bash
+# Check storage directory
+tfvm dir
+ls -la $(tfvm dir)
+```
+</details>
+
+## 🤝 Contributing
+
+We welcome contributions! TFVM is open source and community-driven.
+
+### Quick Contribution Guide
+
+1. **🍴 Fork** the repository
+2. **🌿 Create** your feature branch (`git checkout -b feature/amazing-feature`)
+3. **✨ Make** your changes with tests
+4. **✅ Test** your changes (`bun test`)
+5. **📝 Commit** your changes (`git commit -m 'Add amazing feature'`)
+6. **🚀 Push** to the branch (`git push origin feature/amazing-feature`)
+7. **📬 Open** a Pull Request
+
+### Development Setup
+
+```bash
+# Clone and setup
+git clone https://github.com/anindya-dey/tfvm.git
+cd tfvm
+bun install
+
+# Make changes and test
+bun run build
+bun test
+
+# Check types
+bun run lint
+
+# Link for local testing
+npm link
+
+# Test the CLI locally
+tfvm --version
+```
+
+### 🐛 Bug Reports
+
+Found a bug? Please open an issue with:
+- **Environment details** (OS, Node.js version, etc.)
+- **Steps to reproduce** the issue
+- **Expected vs actual behavior**
+- **Screenshots or terminal output** if applicable
+
+### 💡 Feature Requests
+
+Have an idea? We'd love to hear it! Open an issue describing:
+- **The problem** you're trying to solve
+- **Your proposed solution**
+- **Alternative solutions** you've considered
+- **Use cases** and examples
+
+### 🎯 Areas We Need Help
+
+- 🧪 **Testing** - More test coverage and edge cases
+- 📖 **Documentation** - Improve guides and examples  
+- 🌍 **Internationalization** - Support for other languages
+- 🚀 **Performance** - Optimization and speed improvements
+- 🔧 **Features** - New functionality and enhancements
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **Inspiration**: [nvm](https://github.com/nvm-sh/nvm) for Node.js version management
+- **Documentation**: GIFs created using [terminalizer](https://www.npmjs.com/package/terminalizer)
+- **Built with**: [Bun](https://bun.sh) for blazing-fast development
+- **Creator**: Built with ❤️ by [Anindya Dey](https://anindyadey.com)
+- **Community**: Thanks to all [contributors](https://github.com/anindya-dey/tfvm/graphs/contributors) and users!
+
+## 📈 Project Stats
+
+- 🎯 **Bundle Size**: ~11KB (minified)
+- 🧪 **Test Coverage**: 28 passing tests
+- 📦 **Dependencies**: 5 runtime, 3 dev
+- 🚀 **Performance**: Built with modern Fetch API
+- ⚡ **Development**: Powered by Bun
+- 🔄 **CI/CD**: Automated testing on Node.js 18, 20, 22
+
+---
+
+<div align="center">
+
+**⭐ If TFVM helps you, please consider giving it a star on GitHub! ⭐**
+
+[![GitHub stars](https://img.shields.io/github/stars/anindya-dey/tfvm?style=social)](https://github.com/anindya-dey/tfvm/stargazers)
+
+**Made with TypeScript & Bun** • **Powered by Open Source** • **Built for Developers**
+
+[Report Bug](https://github.com/anindya-dey/tfvm/issues) · [Request Feature](https://github.com/anindya-dey/tfvm/issues) · [Contribute](https://github.com/anindya-dey/tfvm/blob/main/CONTRIBUTING.md)
+
+</div>
