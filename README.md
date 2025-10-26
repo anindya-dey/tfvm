@@ -285,7 +285,7 @@ This project is built with modern tools for optimal performance:
   - `@clack/prompts` - Beautiful interactive prompts
   - `node-html-parser` - Fast HTML parsing
   - `fflate` - Fast ZIP compression
-  - `chalk` - Terminal string styling
+  - `chalk` v4 - Terminal string styling (CommonJS compatible)
 
 ### Building from source
 
