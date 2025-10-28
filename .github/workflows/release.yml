@@ -30,16 +30,6 @@ jobs:
       - name: Install dependencies
         run: bun install
       
-      - name: Get version from tag
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-      
-      - name: Update package.json version
-        run: |
-          VERSION="${GITHUB_REF#refs/tags/v}"
-          npm version $VERSION --no-git-tag-version --allow-same-version
-          echo "Updated package.json to version $VERSION"
-      
       - name: Run tests
         run: bun test
       
