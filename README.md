@@ -285,7 +285,7 @@ This project is built with modern tools for optimal performance:
   - `@clack/prompts` - Beautiful interactive prompts
   - `node-html-parser` - Fast HTML parsing
   - `fflate` - Fast ZIP compression
-  - `chalk` v4 - Terminal string styling (CommonJS compatible)
+  - `picocolors` - Ultra-lightweight terminal colors (~1KB)
 
 ### Building from source
 
