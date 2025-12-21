@@ -1,4 +1,4 @@
-import chalk from "chalk";
+import pc from "picocolors";
 
 // Consolidated print utility
 type PrintType = 'success' | 'error' | 'info' | 'plain';
@@ -6,13 +6,13 @@ type PrintType = 'success' | 'error' | 'info' | 'plain';
 export const print = (message: string, type: PrintType = 'plain'): void => {
   switch (type) {
     case 'success':
-      console.log(chalk.greenBright(message));
+      console.log(pc.green(message));
       break;
     case 'error':
-      console.log(chalk.redBright(message));
+      console.log(pc.red(message));
       break;
     case 'info':
-      console.log(chalk.blueBright(message));
+      console.log(pc.blue(message));
       break;
     case 'plain':
     default:
