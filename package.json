@@ -61,7 +61,7 @@
     "citty": "^0.1.6",
     "fflate": "^0.8.2",
     "force": "^0.0.3",
-    "node-html-parser": "^7.0.1",
+    "node-html-parser": "^7.0.2",
     "picocolors": "^1.1.1"
   },
   "devDependencies": {
