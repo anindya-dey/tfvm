@@ -1,6 +1,6 @@
 {
   "name": "tfvm",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "A fast, lightweight CLI tool to manage multiple Terraform versions",
   "author": {
     "name": "Anindya Dey",
