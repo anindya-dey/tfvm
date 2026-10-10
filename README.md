@@ -377,8 +377,8 @@ TFVM organizes Terraform versions in your home directory:
 ├── terraform_1.5.0_darwin_arm64   # Terraform v1.5.0 executable
 ├── terraform_1.6.0_darwin_arm64   # Terraform v1.6.0 executable  
 ├── terraform_1.7.0_darwin_arm64   # Terraform v1.7.0 executable
-├── terraform        # Symlink to tfvm's resolver shim (real binary on Windows)
-├── terraform-node   # Symlink to the node runtime used by the shim
+├── terraform        # Symlink to the resolver shim (real binary on Windows)
+├── .tfvm-shim.js    # Resolver shim that honors .terraform-version (auto-managed)
 ├── manifest.json    # Source of truth for installed versions (auto-managed)
 └── .version-check   # Update check cache (auto-managed)
 ```

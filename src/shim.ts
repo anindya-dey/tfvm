@@ -9,7 +9,7 @@
 // It is deliberately dependency-free and allocation-light: it runs on every
 // `terraform` invocation, so startup cost matters.
 
-import { existsSync, readFileSync } from "fs";
+import { existsSync, readFileSync, realpathSync } from "fs";
 import { join, dirname, resolve } from "path";
 import { spawn } from "child_process";
 import { homedir, platform } from "os";
@@ -19,10 +19,24 @@ interface Manifest {
   active: string | null;
 }
 
-const STORAGE_DIR = join(
-  process.env.TFVM_STORAGE_DIR || process.env.TFVM_PATH || homedir(),
-  ".tfvm"
-);
+// Resolve the storage dir: explicit env first (these point at the dir itself),
+// then the directory this shim lives in (it is copied into the storage dir),
+// then the default ~/.tfvm.
+const resolveStorageDir = (): string => {
+  const envDir = process.env.TFVM_STORAGE_DIR || process.env.TFVM_PATH;
+  if (envDir) return envDir;
+  const entry = process.argv[1];
+  if (entry) {
+    try {
+      return dirname(realpathSync(entry));
+    } catch {
+      // fall through to the default
+    }
+  }
+  return join(homedir(), ".tfvm");
+};
+
+const STORAGE_DIR = resolveStorageDir();
 
 const PIN_FILE = ".terraform-version";
 

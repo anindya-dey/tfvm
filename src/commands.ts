@@ -5,9 +5,13 @@ import {
   unlinkSync,
   statSync,
   writeFileSync,
+  readdirSync,
+  copyFileSync,
+  chmodSync,
+  realpathSync,
 } from "fs";
 import { appendFile, readFile } from "fs/promises";
-import { join } from "path";
+import { join, dirname, delimiter } from "path";
 import { homedir } from "os";
 import { TERRAFORM_RELEASE_REPO, STORAGE_DIR } from "./config";
 import { print, isValidVersion, formatBytes } from "./utils";
@@ -54,7 +58,6 @@ const getTerraformFiles = (): string[] => listVersions().map((v) => v.fileName);
 // by scanning the storage directory for terraform_<ver>_<os>_<arch> executables.
 export const scanForVersions = (storageDir: string): InstalledVersion[] => {
   if (!existsSync(storageDir)) return [];
-  const { readdirSync } = require("fs") as typeof import("fs");
   return readdirSync(storageDir)
     .filter((file) => {
       if (!file.startsWith(TERRAFORM_PREFIX)) return false;
@@ -82,34 +85,62 @@ export const scanForVersions = (storageDir: string): InstalledVersion[] => {
     });
 };
 
-// The active `terraform` is a symlink to the shim on POSIX (no 80 MB copies);
-// on Windows, where symlinks need privileges, it is the real binary copied once.
+const SHIM_FILE = '.tfvm-shim.js';
+
+// Locate the built shim (dist/shim.js) next to the running CLI. Node does not
+// resolve symlinks in process.argv[1], and npm's global bin is a symlink to
+// cli.js, so we realpath it first — otherwise the shim is never found and we'd
+// silently fall back to copying the binary (breaking .terraform-version).
+const resolveShimSource = (): string | null => {
+  const candidates: string[] = [];
+  const entry = process.argv[1];
+  if (entry) {
+    try {
+      candidates.push(join(dirname(realpathSync(entry)), 'shim.js'));
+    } catch {
+      // argv[1] may not exist on disk under some embedders
+    }
+    candidates.push(join(dirname(entry), 'shim.js'));
+  }
+  return candidates.find((candidate) => existsSync(candidate)) ?? null;
+};
+
+// The active `terraform` is a symlink to a self-contained copy of the shim on
+// POSIX (instant switching + working project pinning); on Windows, where
+// symlinks need privileges, it is the real binary copied once.
 const activateVersion = (fileName: string): void => {
-  // Resolve the shim relative to the running CLI (process.argv[1]); bundlers
-  // statically inline __dirname, so it cannot be used here.
-  const cliDir = join(process.argv[1] ? resolveDir(process.argv[1]) : STORAGE_DIR, '');
-  const shimPath = join(cliDir, 'shim.js');
   const activePath = join(STORAGE_DIR, TERRAFORM_BINARY);
   const targetPath = join(STORAGE_DIR, fileName);
 
   rmSync(activePath, { force: true });
-  const nodeLink = join(STORAGE_DIR, 'terraform-node');
-  rmSync(nodeLink, { force: true });
+  rmSync(join(STORAGE_DIR, 'terraform-node'), { force: true });
 
-  if (process.platform !== 'win32' && existsSync(shimPath)) {
-    // `terraform` runs the shim with the same node binary that runs tfvm.
-    symlinkSync(process.execPath, nodeLink);
-    symlinkSync(shimPath, activePath);
+  const shimSource = resolveShimSource();
+  if (process.platform !== 'win32' && shimSource) {
+    // Copy the shim into STORAGE_DIR so ~/.tfvm is self-contained and keeps
+    // working across tfvm upgrades/uninstalls; then symlink `terraform` to it.
+    const shimDest = join(STORAGE_DIR, SHIM_FILE);
+    copyFileSync(shimSource, shimDest);
+    try {
+      chmodSync(shimDest, 0o755);
+    } catch {
+      // chmod is best-effort
+    }
+    symlinkSync(shimDest, activePath);
   } else {
-    const { copyFileSync } = require("fs") as typeof import("fs");
     copyFileSync(targetPath, activePath);
   }
   setActive(fileName);
 };
 
-const resolveDir = (entryPath: string): string => {
-  const { dirname, resolve } = require("path") as typeof import("path");
-  return dirname(resolve(entryPath));
+// Find a `terraform` in PATH that is not tfvm's own, to warn about shadowing.
+const foreignTerraformInPath = (): string | null => {
+  for (const dir of (process.env.PATH || '').split(delimiter)) {
+    if (!dir || dir === STORAGE_DIR) continue;
+    const candidate = join(dir, TERRAFORM_BINARY);
+    if (existsSync(candidate)) return candidate;
+  }
+  return null;
 };
 
 const addToPath = async (): Promise<void> => {
@@ -335,6 +366,13 @@ export const use = async (version?: string): Promise<void> => {
 
   activateVersion(entry.fileName);
   print(`Now using Terraform ${entry.version}!`, 'success');
+
+  const shadow = foreignTerraformInPath();
+  if (shadow) {
+    print(`Heads up: another terraform exists at ${shadow}.`, 'info');
+    print(`If "terraform" still runs the wrong version, make sure ${STORAGE_DIR} is first in PATH, then run: hash -r`, 'info');
+  }
+
   await addToPath();
 };
 
