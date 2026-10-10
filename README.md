@@ -2,7 +2,7 @@
 
 ### A modern, fast CLI tool to manage multiple Terraform versions on your system
 
-[![npm version](https://img.shields.io/npm/v/tfvm?color=blue&label=version&style=for-the-badge)](https://www.npmjs.com/package/tfvm) [![Total Downloads](https://img.shields.io/npm/dt/tfvm?label=total%20downloads&style=for-the-badge)](https://www.npmjs.com/package/tfvm) [![license](https://img.shields.io/npm/l/tfvm?color=lightblue&style=for-the-badge)](https://www.npmjs.com/package/tfvm) [![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen?style=for-the-badge)](https://nodejs.org) [![CI](https://img.shields.io/github/actions/workflow/status/anindya-dey/tfvm/ci.yml?style=for-the-badge&label=CI)](https://github.com/anindya-dey/tfvm/actions)
+[![npm version](https://img.shields.io/npm/v/tfvm?color=blue&label=version&style=for-the-badge)](https://www.npmjs.com/package/tfvm) [![Total Downloads](https://img.shields.io/npm/dt/tfvm?label=total%20downloads&style=for-the-badge)](https://www.npmjs.com/package/tfvm) [![license](https://img.shields.io/npm/l/tfvm?color=lightblue&style=for-the-badge)](https://www.npmjs.com/package/tfvm) [![Node.js](https://img.shields.io/badge/node-%3E%3D22.0.0-brightgreen?style=for-the-badge)](https://nodejs.org) [![CI](https://img.shields.io/github/actions/workflow/status/anindya-dey/tfvm/ci.yml?style=for-the-badge&label=CI)](https://github.com/anindya-dey/tfvm/actions)
 
 > **Never worry about Terraform version conflicts again!** 🚀  
 > Seamlessly switch between Terraform versions for different projects, just like `nvm` for Node.js.
@@ -28,7 +28,7 @@
 
 ## 🚀 Quick Start
 
-**Requirements:** Node.js >= 18.0.0
+**Requirements:** Node.js >= 22.0.0 (24 LTS recommended)
 
 Install globally via npm:
 
@@ -56,8 +56,8 @@ bun add -g tfvm
 # 1. Install a specific Terraform version
 $ tfvm download 1.6.0
 
-# 2. Switch to it  
-$ tfvm use
+# 2. Switch to it (non-interactive!)
+$ tfvm use 1.6.0
 
 # 3. Verify it's active
 $ terraform version
@@ -65,22 +65,28 @@ Terraform v1.6.0
 
 # 4. List all your versions
 $ tfvm list
+
+# 5. Pin this project to a specific version (like .nvmrc)
+$ tfvm pin 1.6.0   # writes .terraform-version
+$ terraform version # always runs 1.6.0 in this directory
 ```
 
 ## ✨ Features
 
-- 🔄 **Easy version switching** - Switch between Terraform versions with one command
+- 🔄 **Easy version switching** - Switch between Terraform versions with one command, interactive or with an explicit version
+- 📌 **Project pinning** - `.terraform-version` files give each project its own Terraform, resolved automatically on every `terraform` invocation
 - 📦 **Automatic downloads** - Download any Terraform version from HashiCorp's official releases
 - 🎯 **Interactive prompts** - User-friendly selection menus and confirmations
 - 🗂️ **Local management** - Keep multiple versions locally and switch as needed
 - 🖥️ **Cross-platform** - Works on Windows, macOS, and Linux
-- ⚡ **Fast & lightweight** - Optimized bundle size (~16KB) with minimal dependencies
-- 🔧 **Configurable** - Customize storage directory via configuration files
-- 🛡️ **Safe operations** - Confirmation prompts for destructive actions
-- 🔐 **Integrity verification** - Downloads are verified against HashiCorp's published SHA256 checksums
+- ⚡ **Fast & lightweight** - Optimized bundle size with minimal dependencies, lazy-loaded heavy libraries, and a symlinked shim (no 80 MB copies when switching)
+- 🔧 **Configurable** - Customize storage directory via environment variables or configuration files
+- 🛡️ **Safe operations** - Confirmation prompts for destructive actions, active-version protection, and non-interactive `--yes` flags for scripts
+- 🔐 **Integrity verification** - Downloads are verified against HashiCorp's published SHA256 checksums (streamed and hashed during download)
 - 🔍 **Version discovery** - Browse all available Terraform releases
 - 📊 **Smart filtering** - Automatically handles platform-specific downloads
 - 🔔 **Update notifications** - Get notified when new TFVM versions are available
+- 🤖 **Scriptable** - `list --json`, non-interactive commands, and clear TTY guards make it automation-friendly
 
 ## 🚀 Common Use Cases
 
@@ -90,11 +96,13 @@ $ tfvm list
 ```bash
 # For legacy project requiring Terraform 1.4.x
 cd legacy-infrastructure
-tfvm use  # Select 1.4.6
+tfvm pin 1.4.6    # writes .terraform-version once
+terraform version # uses 1.4.6 automatically from now on
 
 # For new project using latest features  
 cd new-infrastructure
-tfvm use  # Select 1.6.0
+tfvm pin 1.6.0
+terraform version # uses 1.6.0 automatically
 ```
 </details>
 
@@ -138,8 +146,9 @@ List locally downloaded Terraform versions or browse remote versions.
 
 **Local versions:**
 ```sh
-tfvm list    # Show all locally installed versions
-tfvm ls      # Short alias
+tfvm list        # Show all locally installed versions (with sizes and active marker)
+tfvm ls          # Short alias
+tfvm list --json # Machine-readable JSON (for scripts and CI)
 ```
 
 ![ls](assets/gifs/ls.gif)
@@ -160,7 +169,7 @@ tfvm ls -r           # Short alias with flag
 
 ### `tfvm download` | `tfvm d`
 
-Download and install Terraform versions from HashiCorp's official releases.
+Download and install Terraform versions from HashiCorp's official releases. Downloads are streamed, SHA256-verified against HashiCorp's published checksums, and idempotent.
 
 **Interactive download:**
 ```sh
@@ -173,6 +182,7 @@ tfvm d          # Short alias
 **Version-specific download:**
 ```sh
 tfvm download 1.6.0    # Download specific version releases
+tfvm download 1.6.0 --force  # Re-download even if already installed
 tfvm d 1.6.0          # Short alias
 ```
 
@@ -182,20 +192,22 @@ tfvm d 1.6.0          # Short alias
 
 ### `tfvm remove` | `tfvm rm`
 
-Remove installed Terraform versions from your system.
+Remove installed Terraform versions from your system. The active version is protected from removal.
 
 **Remove specific version:**
 ```sh
-tfvm remove    # Select which version to remove
-tfvm rm       # Short alias
+tfvm remove 1.5.7   # Remove a specific version (non-interactive)
+tfvm remove        # Select which version to remove interactively
+tfvm rm            # Short alias
 ```
 
 ![remove](assets/gifs/remove.gif)
 
 **Remove all versions:**
 ```sh
-tfvm remove --all    # Remove all installed versions
-tfvm rm -a          # Short alias with flag
+tfvm remove --all        # Remove all installed versions
+tfvm remove --all --yes  # Skip the confirmation prompt (scripts)
+tfvm rm -a              # Short alias with flag
 ```
 
 ![remove-all](assets/gifs/remove-all.gif)
@@ -204,15 +216,38 @@ tfvm rm -a          # Short alias with flag
 
 ### `tfvm use`
 
-Set a specific Terraform version as the default system version.
+Set a specific Terraform version as the default system version. On macOS/Linux the active `terraform` is a lightweight symlink to tfvm's resolver (version switches are instant and copy nothing); on Windows it is a copied binary.
 
 ```sh
-tfvm use    # Select from installed versions to set as default
+tfvm use 1.6.0    # Activate a specific version (non-interactive)
+tfvm use          # Select from installed versions interactively
 ```
 
 ![use](assets/gifs/use.gif)
 
 > **💡 Note:** You may need to add the TFVM directory to your PATH environment variable. The `tfvm dir` command shows the exact path to add.
+
+---
+
+### `tfvm pin`
+
+Pin the current directory (and everything beneath it) to a specific Terraform version using a `.terraform-version` file — like `.nvmrc` for Terraform. The `terraform` shim resolves the pin automatically on every invocation.
+
+```sh
+tfvm pin 1.6.0   # Pin this project to 1.6.0
+tfvm pin         # Pin to the currently active version
+terraform version # Always runs 1.6.0 while inside this directory
+```
+
+---
+
+### `tfvm which`
+
+Print the path of the Terraform binary the shim would currently run (active version, or the pinned one inside a pinned directory).
+
+```sh
+tfvm which
+```
 
 ---
 
@@ -277,10 +312,10 @@ echo '{"STORAGE_DIR": "/shared/tools/terraform"}' | sudo tee /etc/tfvm/config.js
 
 This project is built with modern tools for optimal performance:
 
-- **Runtime** - Node.js 18+ (for production) / Bun (for development)
+- **Runtime** - Node.js 22+ (for production) / Bun (for development)
 - **TypeScript** - Type-safe development with ESNext features
 - **Bun** - Fast bundling and testing
-- **Modern APIs** - Fetch API for HTTP requests (Node.js 18+)
+- **Modern APIs** - Fetch API for HTTP requests (Node.js 22+)
 - **Modern Dependencies**:
   - `citty` - Modern lightweight CLI framework
   - `@clack/prompts` - Beautiful interactive prompts
@@ -324,12 +359,12 @@ npm link
 - TypeScript with strict mode enabled
 - ES modules in source code
 - Comprehensive test suite using Bun's test runner
-- CI/CD with GitHub Actions testing Node.js 18, 20, and 22
+- CI/CD with GitHub Actions testing Node.js 22 and 24
 
 **Production:**
 - Bundled to CommonJS for broad Node.js compatibility
-- Minified output (~16KB)
-- Node.js 18+ required (uses native Fetch API)
+- Minified output (~21KB CLI + 1.5KB shim)
+- Node.js 22+ required (uses native Fetch API)
 - Zero TypeScript runtime dependencies
 - Modern, lightweight dependencies
 
@@ -339,12 +374,13 @@ TFVM organizes Terraform versions in your home directory:
 
 ```
 ~/.tfvm/
-├── terraform_1.5.0      # Terraform v1.5.0 executable
-├── terraform_1.6.0      # Terraform v1.6.0 executable  
-├── terraform_1.7.0      # Terraform v1.7.0 executable
-├── terraform            # Copy of the currently active version (terraform.exe on Windows)
-├── .active-version      # Name of the active version (auto-managed)
-└── .version-check       # Update check cache (auto-managed)
+├── terraform_1.5.0_darwin_arm64   # Terraform v1.5.0 executable
+├── terraform_1.6.0_darwin_arm64   # Terraform v1.6.0 executable  
+├── terraform_1.7.0_darwin_arm64   # Terraform v1.7.0 executable
+├── terraform        # Symlink to tfvm's resolver shim (real binary on Windows)
+├── terraform-node   # Symlink to the node runtime used by the shim
+├── manifest.json    # Source of truth for installed versions (auto-managed)
+└── .version-check   # Update check cache (auto-managed)
 ```
 
 ## 🔍 Troubleshooting
@@ -519,12 +555,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📈 Project Stats
 
-- 🎯 **Bundle Size**: ~16KB (minified)
-- 🧪 **Test Coverage**: 60 passing tests
+- 🎯 **Bundle Size**: ~21KB CLI + 1.5KB shim (minified)
+- 🧪 **Test Coverage**: 66 passing tests
 - 📦 **Dependencies**: 5 runtime, 3 dev
-- 🚀 **Performance**: Built with modern Fetch API
+- 🚀 **Performance**: Streamed+hashed downloads, lazy-loaded libraries, symlinked version switches
 - ⚡ **Development**: Powered by Bun
-- 🔄 **CI/CD**: Automated testing on Node.js 18, 20, 22
+- 🔄 **CI/CD**: Automated testing on Node.js 22, 24
 
 ---
 

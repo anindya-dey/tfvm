@@ -1,5 +1,5 @@
-import { readFile, writeFile, mkdir } from "fs/promises";
-import { existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
+import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { STORAGE_DIR } from "./config";
 import { printInfo } from "./utils";
@@ -29,25 +29,22 @@ const fetchLatestVersion = async (): Promise<string> => {
   }
 };
 
-const shouldCheck = async (): Promise<boolean> => {
-  if (!existsSync(VERSION_CACHE_FILE)) return true;
-  
+const readCache = (): VersionCache | null => {
   try {
-    const data = await readFile(VERSION_CACHE_FILE, 'utf-8');
-    const cache: VersionCache = JSON.parse(data);
-    return Date.now() - cache.lastCheck > CHECK_INTERVAL;
+    if (!existsSync(VERSION_CACHE_FILE)) return null;
+    const cache: VersionCache = JSON.parse(readFileSync(VERSION_CACHE_FILE, "utf-8"));
+    if (typeof cache.lastCheck === "number" && typeof cache.latestVersion === "string") {
+      return cache;
+    }
   } catch {
-    return true;
+    // Treat unreadable caches as absent.
   }
+  return null;
 };
 
 const updateCache = async (latestVersion: string): Promise<void> => {
-  const cache: VersionCache = {
-    lastCheck: Date.now(),
-    latestVersion
-  };
-  
   await mkdir(STORAGE_DIR, { recursive: true });
+  const cache: VersionCache = { lastCheck: Date.now(), latestVersion };
   await writeFile(VERSION_CACHE_FILE, JSON.stringify(cache));
 };
 
@@ -90,17 +87,31 @@ const renderUpdateBox = (currentVersion: string, latestVersion: string): void =>
   printInfo(`└${border}┘`);
 };
 
+// Non-blocking without the write race: the cache is read synchronously at
+// startup, the banner is printed from cached data (instant), and only the
+// background refresh touches the network. The returned promise is refreshed
+// before the process exits so the cache write is never torn.
 export const checkForUpdates = async (currentVersion: string): Promise<void> => {
-  if (!(await shouldCheck())) return;
-  
+  const cache = readCache();
+
+  if (cache && compareVersions(currentVersion, cache.latestVersion)) {
+    console.log('');
+    renderUpdateBox(currentVersion, cache.latestVersion);
+    console.log('');
+  }
+
+  if (cache && Date.now() - cache.lastCheck <= CHECK_INTERVAL) return;
+
   try {
     const latestVersion = await fetchLatestVersion();
-    await updateCache(latestVersion);
-    
-    if (compareVersions(currentVersion, latestVersion)) {
-      console.log('');
-      renderUpdateBox(currentVersion, latestVersion);
-      console.log('');
+    if (latestVersion !== cache?.latestVersion) {
+      await updateCache(latestVersion);
+      if (!cache && compareVersions(currentVersion, latestVersion)) {
+        // First run has no cached banner; show it after refreshing.
+        console.log('');
+        renderUpdateBox(currentVersion, latestVersion);
+        console.log('');
+      }
     }
   } catch {
     // Silently fail - don't interrupt user experience

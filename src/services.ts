@@ -1,12 +1,10 @@
 import { writeFile, chmod, unlink, mkdir, readFile } from "fs/promises";
-import { existsSync, createWriteStream } from "fs";
+import { existsSync, createWriteStream, statSync } from "fs";
 import { basename, join } from "path";
 import { arch, platform } from "os";
-import { Readable } from "stream";
+import { Readable, Transform } from "stream";
 import { pipeline } from "stream/promises";
 import { createHash } from "crypto";
-import { parse } from "node-html-parser";
-import { unzipSync } from "fflate";
 import { TERRAFORM_RELEASE_REPO, STORAGE_DIR } from "./config";
 import { isTerraformLink, extractTerraformVersion, isZipPackage, print } from "./utils";
 
@@ -17,7 +15,21 @@ export interface TerraformExecutable {
 }
 
 const METADATA_TIMEOUT_MS = 15_000;
-const DOWNLOAD_TIMEOUT_MS = 120_000;
+const DOWNLOAD_TIMEOUT_MS = 300_000; // 5 min for ~25-30 MB zips on slow links
+const MAX_RETRIES = 2;
+const RETRY_DELAY_MS = 1_000;
+
+// Heavy parser libraries are loaded lazily so `tfvm list`/`tfvm which`/shim
+// invocations don't pay for HTML parsing or ZIP decompression at startup.
+const lazyParseHtml = async (html: string) => {
+  const { parse } = await import("node-html-parser");
+  return parse(html);
+};
+
+const lazyUnzip = async (data: Uint8Array) => {
+  const { unzipSync } = await import("fflate");
+  return unzipSync(data);
+};
 
 // Helper to get platform and architecture identifiers
 interface SystemInfo {
@@ -50,10 +62,7 @@ export const getSystemInfo = (): SystemInfo => ({
 });
 
 // Fetch with an abort-based timeout so the CLI can never hang forever
-const fetchWithTimeout = async (
-  url: string,
-  timeoutMs: number
-): Promise<Response> => {
+const fetchWithTimeout = async (url: string, timeoutMs: number): Promise<Response> => {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -68,21 +77,50 @@ const fetchWithTimeout = async (
   }
 };
 
+const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Retry transient failures (timeouts, 5xx, network resets) with backoff.
+const fetchWithRetry = async (url: string, timeoutMs: number): Promise<Response> => {
+  let lastError: Error | null = null;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const response = await fetchWithTimeout(url, timeoutMs);
+      if (response.status >= 500 && attempt < MAX_RETRIES) {
+        await sleep(RETRY_DELAY_MS * (attempt + 1));
+        continue;
+      }
+      return response;
+    } catch (err: any) {
+      lastError = err;
+      if (attempt < MAX_RETRIES) await sleep(RETRY_DELAY_MS * (attempt + 1));
+    }
+  }
+  throw lastError ?? new Error(`Request failed: ${url}`);
+};
+
 // Fetch HTML using native fetch
 const fetchUrl = async (url: string): Promise<string> => {
-  const response = await fetchWithTimeout(url, METADATA_TIMEOUT_MS);
+  const response = await fetchWithRetry(url, METADATA_TIMEOUT_MS);
   if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
   return response.text();
 };
 
-// Download file using fetch with stream
-const downloadFile = async (url: string, destPath: string): Promise<void> => {
-  const response = await fetchWithTimeout(url, DOWNLOAD_TIMEOUT_MS);
+// Stream a download to disk while hashing it, so peak memory stays flat
+const downloadFile = async (url: string, destPath: string): Promise<string> => {
+  const response = await fetchWithRetry(url, DOWNLOAD_TIMEOUT_MS);
   if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
   if (!response.body) throw new Error("No response body");
 
-  const writeStream = createWriteStream(destPath);
-  await pipeline(Readable.fromWeb(response.body as any), writeStream);
+  const hash = createHash("sha256");
+  const hasher = new Transform({
+    transform(chunk: Buffer, _encoding, callback) {
+      hash.update(chunk);
+      callback(null, chunk);
+    },
+  });
+
+  await pipeline(Readable.fromWeb(response.body as any), hasher, createWriteStream(destPath));
+  return hash.digest("hex");
 };
 
 // Parse a HashiCorp SHA256SUMS document into a filename -> digest map
@@ -101,10 +139,9 @@ const fetchChecksums = async (version: string): Promise<Map<string, string>> => 
 };
 
 const verifyChecksum = async (
-  zipPath: string,
   fileName: string,
   version: string,
-  zipData: Buffer
+  actualSha256: string
 ): Promise<void> => {
   let checksums: Map<string, string>;
   try {
@@ -120,9 +157,8 @@ const verifyChecksum = async (
     return;
   }
 
-  const actual = createHash("sha256").update(zipData).digest("hex");
-  if (actual !== expected) {
-    throw new Error(`Checksum mismatch for ${fileName} (expected ${expected}, got ${actual})`);
+  if (actualSha256 !== expected) {
+    throw new Error(`Checksum mismatch for ${fileName} (expected ${expected}, got ${actualSha256})`);
   }
   print(`Verified SHA256 checksum for ${fileName}`, "success");
 };
@@ -130,7 +166,7 @@ const verifyChecksum = async (
 export const fetchTerraformVersions = async (): Promise<string[]> => {
   try {
     const html = await fetchUrl(TERRAFORM_RELEASE_REPO);
-    const root = parse(html);
+    const root = await lazyParseHtml(html);
     const versions: string[] = [];
 
     const links = root.querySelectorAll("a");
@@ -154,7 +190,7 @@ export const fetchTerraformVersions = async (): Promise<string[]> => {
 export const listTerraformExecutables = async (version: string): Promise<TerraformExecutable[]> => {
   try {
     const html = await fetchUrl(`${TERRAFORM_RELEASE_REPO}/${version}/`);
-    const root = parse(html);
+    const root = await lazyParseHtml(html);
     const executables: TerraformExecutable[] = [];
 
     // Get current platform and architecture
@@ -199,27 +235,43 @@ export const listTerraformExecutables = async (version: string): Promise<Terrafo
   }
 };
 
-export const downloadTerraform = async (packageUrl: string, version: string): Promise<void> => {
-  const fileName = basename(packageUrl);
-  print(`Downloading and extracting "${fileName}"...`, "info");
+export interface DownloadResult {
+  fileName: string;
+  baseName: string;
+  size: number;
+  sha256: string;
+}
 
-  if (!existsSync(STORAGE_DIR)) {
-    print(`Creating storage directory: ${STORAGE_DIR}`, "info");
-    await mkdir(STORAGE_DIR, { recursive: true });
+// Downloads, verifies, and extracts a Terraform zip into STORAGE_DIR.
+// Idempotent: an existing install short-circuits unless `force` is set.
+export const downloadTerraform = async (
+  packageUrl: string,
+  version: string,
+  { force = false }: { force?: boolean } = {}
+): Promise<DownloadResult> => {
+  const fileName = basename(packageUrl);
+  const baseName = basename(packageUrl, ".zip");
+  const targetPath = join(STORAGE_DIR, baseName);
+
+  if (!force && existsSync(targetPath)) {
+    print(`${baseName} is already installed. Use --force to re-download.`, "info");
+    const stats = statSync(targetPath);
+    return { fileName, baseName, size: stats.size, sha256: "" };
   }
 
-  const zipPath = join(STORAGE_DIR, fileName);
+  print(`Downloading and extracting "${fileName}"...`, "info");
+
+  await mkdir(STORAGE_DIR, { recursive: true });
+
+  const zipPath = join(STORAGE_DIR, `${fileName}.part`);
 
   try {
-    await downloadFile(packageUrl, zipPath);
+    const actualSha256 = await downloadFile(packageUrl, zipPath);
+
+    await verifyChecksum(fileName, version, actualSha256);
 
     const zipData = await readFile(zipPath);
-
-    // Verify integrity against HashiCorp's published checksums before extracting
-    await verifyChecksum(zipPath, fileName, version, zipData);
-
-    const unzipped = unzipSync(new Uint8Array(zipData));
-    const baseName = basename(packageUrl, ".zip");
+    const unzipped = await lazyUnzip(new Uint8Array(zipData));
 
     // Process extracted files
     for (const [entryName, data] of Object.entries(unzipped)) {
@@ -232,10 +284,10 @@ export const downloadTerraform = async (packageUrl: string, version: string): Pr
       await chmod(extractPath, 0o755);
     }
 
-    // NOTE: downloading does not activate the version. Run `tfvm use` to set the
-    // default `terraform` binary so download and activation stay independent.
     await unlink(zipPath);
+    const stats = statSync(targetPath);
     print(`Successfully installed from ${fileName}!`, "success");
+    return { fileName, baseName, size: stats.size, sha256: actualSha256 };
   } catch (err: any) {
     // Best-effort cleanup of a partially downloaded archive
     try {

@@ -26,6 +26,19 @@ export const printInfo = (message: string) => print(message, 'info');
 export const isValidVersion = (version: string): boolean =>
   /^[0-9]+\.[0-9]+\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$/.test(version.trim());
 
+// Human-readable byte sizes for `tfvm list`
+export const formatBytes = (bytes: number): string => {
+  if (!Number.isFinite(bytes) || bytes < 0) return "";
+  const units = ["B", "KB", "MB", "GB"];
+  let value = bytes;
+  let unit = 0;
+  while (value >= 1024 && unit < units.length - 1) {
+    value /= 1024;
+    unit++;
+  }
+  return `${unit === 0 || value >= 100 ? Math.round(value) : value.toFixed(1)} ${units[unit]}`;
+};
+
 // Terraform link validation
 export const isTerraformLink = (linkHref: string | null | undefined): boolean => {
   if (!linkHref || typeof linkHref !== 'string') {

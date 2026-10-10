@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18, 20, 22, 24]
+        node-version: [22, 24]
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -46,5 +46,5 @@ jobs:
 
       - name: Test CLI with Node.js ${{ matrix.node-version }}
         run: |
-          node dist/tfvm.js --version
-          node dist/tfvm.js --help
+          node dist/cli.js --version
+          node dist/cli.js --help

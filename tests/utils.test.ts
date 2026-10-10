@@ -1,5 +1,5 @@
 import { describe, test, expect } from "bun:test";
-import { extractTerraformVersion, isTerraformLink, isZipPackage, isValidVersion } from "../src/utils";
+import { extractTerraformVersion, isTerraformLink, isZipPackage, isValidVersion, formatBytes } from "../src/utils";
 
 describe("Utils", () => {
   describe("extractTerraformVersion", () => {
@@ -52,6 +52,20 @@ describe("Utils", () => {
       expect(isValidVersion("../etc/passwd")).toBe(false);
       expect(isValidVersion("1.6.0/../../x")).toBe(false);
       expect(isValidVersion("latest")).toBe(false);
+    });
+  });
+
+  describe("formatBytes", () => {
+    test("formats common sizes", () => {
+      expect(formatBytes(0)).toBe("0 B");
+      expect(formatBytes(512)).toBe("512 B");
+      expect(formatBytes(2048)).toBe("2.0 KB");
+      expect(formatBytes(88_090_000)).toBe("84.0 MB");
+    });
+
+    test("handles invalid input", () => {
+      expect(formatBytes(-1)).toBe("");
+      expect(formatBytes(Number.NaN)).toBe("");
     });
   });
 });

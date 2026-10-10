@@ -2,9 +2,56 @@
 
 import { defineCommand, runMain } from "citty";
 import { TERRAFORM_RELEASE_REPO, STORAGE_DIR } from "./config";
-import { list, download, remove, use, dir } from "./commands";
+import { list, download, remove, use, pin, which, dir } from "./commands";
 import { checkForUpdates } from "./update-checker";
 import pkg from "../package.json";
+
+const listArgs = {
+  remote: {
+    type: "boolean",
+    alias: "r",
+    description: `Displays a list of all terraform versions available at ${TERRAFORM_RELEASE_REPO}`,
+  },
+  json: {
+    type: "boolean",
+    alias: "j",
+    description: "Output machine-readable JSON",
+  },
+} as const;
+
+const downloadArgs = {
+  version: {
+    type: "positional",
+    description: "Terraform version to download, e.g. 1.6.0. Omit to browse.",
+    required: false,
+  },
+  force: {
+    type: "boolean",
+    alias: "f",
+    description: "Re-download even if the version is already installed",
+  },
+} as const;
+
+const removeArgs = {
+  version: {
+    type: "positional",
+    description: "Terraform version to remove. Omit to select interactively.",
+    required: false,
+  },
+  all: {
+    type: "boolean",
+    alias: "a",
+    description: `remove all versions of terraform from ${STORAGE_DIR}`,
+  },
+  yes: {
+    type: "boolean",
+    alias: "y",
+    description: "Skip the confirmation prompt",
+  },
+} as const;
+
+const asVersion = (value: unknown): string | undefined =>
+  typeof value === "string" ? value : undefined;
 
 const main = defineCommand({
   meta: {
@@ -18,15 +65,9 @@ const main = defineCommand({
         name: "list",
         description: `list all the downloaded versions of terraform or the ones available at ${TERRAFORM_RELEASE_REPO}`,
       },
-      args: {
-        remote: {
-          type: "boolean",
-          alias: "r",
-          description: `Displays a list of all terraform versions available at ${TERRAFORM_RELEASE_REPO}`,
-        },
-      },
+      args: listArgs,
       run: async ({ args }) => {
-        await list({ remote: !!args.remote });
+        await list({ remote: !!args.remote, json: !!args.json });
       },
     }),
     ls: defineCommand({
@@ -34,15 +75,9 @@ const main = defineCommand({
         name: "ls",
         description: "Alias for list command",
       },
-      args: {
-        remote: {
-          type: "boolean",
-          alias: "r",
-          description: `Displays a list of all terraform versions available at ${TERRAFORM_RELEASE_REPO}`,
-        },
-      },
+      args: listArgs,
       run: async ({ args }) => {
-        await list({ remote: !!args.remote });
+        await list({ remote: !!args.remote, json: !!args.json });
       },
     }),
     download: defineCommand({
@@ -50,15 +85,9 @@ const main = defineCommand({
         name: "download",
         description: `downloads and extracts a specific package of terraform from ${TERRAFORM_RELEASE_REPO}`,
       },
-      args: {
-        version: {
-          type: "positional",
-          description: "If provided, a list of all the terraform packages for this version would be displayed for the user to choose from",
-          required: false,
-        },
-      },
+      args: downloadArgs,
       run: async ({ args }) => {
-        await download(typeof args.version === 'string' ? args.version : undefined);
+        await download(asVersion(args.version), { force: !!args.force });
       },
     }),
     d: defineCommand({
@@ -66,15 +95,9 @@ const main = defineCommand({
         name: "d",
         description: "Alias for download command",
       },
-      args: {
-        version: {
-          type: "positional",
-          description: "If provided, a list of all the terraform packages for this version would be displayed for the user to choose from",
-          required: false,
-        },
-      },
+      args: downloadArgs,
       run: async ({ args }) => {
-        await download(typeof args.version === 'string' ? args.version : undefined);
+        await download(asVersion(args.version), { force: !!args.force });
       },
     }),
     remove: defineCommand({
@@ -82,15 +105,9 @@ const main = defineCommand({
         name: "remove",
         description: `removes a specific package or all packages of terraform saved locally at ${STORAGE_DIR}`,
       },
-      args: {
-        all: {
-          type: "boolean",
-          alias: "a",
-          description: `remove all versions of terraform from ${STORAGE_DIR}`,
-        },
-      },
+      args: removeArgs,
       run: async ({ args }) => {
-        await remove({ all: !!args.all });
+        await remove({ all: !!args.all, yes: !!args.yes }, asVersion(args.version));
       },
     }),
     rm: defineCommand({
@@ -98,15 +115,9 @@ const main = defineCommand({
         name: "rm",
         description: "Alias for remove command",
       },
-      args: {
-        all: {
-          type: "boolean",
-          alias: "a",
-          description: `remove all versions of terraform from ${STORAGE_DIR}`,
-        },
-      },
+      args: removeArgs,
       run: async ({ args }) => {
-        await remove({ all: !!args.all });
+        await remove({ all: !!args.all, yes: !!args.yes }, asVersion(args.version));
       },
     }),
     use: defineCommand({
@@ -114,8 +125,40 @@ const main = defineCommand({
         name: "use",
         description: `sets a specific terraform release from ${STORAGE_DIR} as default which can be used directly in the terminal.`,
       },
+      args: {
+        version: {
+          type: "positional",
+          description: "Terraform version to activate. Omit to select interactively.",
+          required: false,
+        },
+      },
+      run: async ({ args }) => {
+        await use(asVersion(args.version));
+      },
+    }),
+    pin: defineCommand({
+      meta: {
+        name: "pin",
+        description: `writes a ${".terraform-version"} file in the current directory so the terraform shim uses that version here`,
+      },
+      args: {
+        version: {
+          type: "positional",
+          description: "Version to pin. Omit to pin the currently active version.",
+          required: false,
+        },
+      },
+      run: async ({ args }) => {
+        await pin(asVersion(args.version));
+      },
+    }),
+    which: defineCommand({
+      meta: {
+        name: "which",
+        description: "prints the path of the active terraform version",
+      },
       run: async () => {
-        await use();
+        await which();
       },
     }),
     dir: defineCommand({
@@ -147,4 +190,3 @@ const init = async () => {
 };
 
 init();
-

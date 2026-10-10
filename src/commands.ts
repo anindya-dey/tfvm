@@ -1,18 +1,27 @@
 import {
   existsSync,
-  readdirSync,
   rmSync,
-  copyFileSync,
-  chmodSync,
+  symlinkSync,
+  unlinkSync,
   statSync,
-  readFileSync,
   writeFileSync,
 } from "fs";
 import { appendFile, readFile } from "fs/promises";
 import { join } from "path";
 import { homedir } from "os";
 import { TERRAFORM_RELEASE_REPO, STORAGE_DIR } from "./config";
-import { print, isValidVersion } from "./utils";
+import { print, isValidVersion, formatBytes } from "./utils";
+import {
+  listVersions,
+  findVersion,
+  getActiveFileName,
+  upsertVersion,
+  removeVersion,
+  setActive,
+  readManifest,
+  writeManifest,
+  type InstalledVersion,
+} from "./manifest";
 import { fetchTerraformVersions, listTerraformExecutables, downloadTerraform } from "./services";
 import { 
   selectVersion, 
@@ -27,8 +36,7 @@ import {
 const SHELL_FILES = ['.bashrc', '.zshrc', '.profile', '.bash_profile'] as const;
 const TERRAFORM_BINARY = process.platform === 'win32' ? 'terraform.exe' : 'terraform';
 const TERRAFORM_PREFIX = 'terraform_';
-const MIN_VERSION_PARTS = 4; // terraform_{version}_{os}_{arch}
-const ACTIVE_VERSION_MARKER = '.active-version';
+const PIN_FILE = '.terraform-version';
 
 // Helpers
 const isPathInShellConfig = async (shellFile: string, pathToCheck: string): Promise<boolean> => {
@@ -40,64 +48,68 @@ const isPathInShellConfig = async (shellFile: string, pathToCheck: string): Prom
   }
 };
 
-export const getTerraformFiles = (storageDir: string = STORAGE_DIR): string[] => {
+const getTerraformFiles = (): string[] => listVersions().map((v) => v.fileName);
+
+// Legacy compatibility: recover versions installed before the manifest existed
+// by scanning the storage directory for terraform_<ver>_<os>_<arch> executables.
+export const scanForVersions = (storageDir: string): InstalledVersion[] => {
   if (!existsSync(storageDir)) return [];
-  
-  return readdirSync(storageDir).filter(file => {
-    if (!file.startsWith(TERRAFORM_PREFIX)) return false;
-    if (file.split('_').length < MIN_VERSION_PARTS) return false;
-    
-    try {
-      const stats = statSync(join(storageDir, file));
-      if (!stats.isFile()) return false;
-      // Windows does not expose POSIX executable bits, so only gate on them elsewhere
-      return process.platform === 'win32' || (stats.mode & 0o111) !== 0;
-    } catch {
-      return false;
-    }
-  });
-};
-
-const setActiveVersion = (file: string): void => {
-  try {
-    writeFileSync(join(STORAGE_DIR, ACTIVE_VERSION_MARKER), file);
-  } catch {
-    // Non-fatal: activation still works, only the removal guard loses precision
-  }
-};
-
-export const getActiveVersion = (
-  files: string[],
-  storageDir: string = STORAGE_DIR
-): string | null => {
-  // Preferred source of truth: the marker written by `tfvm use`
-  const markerPath = join(storageDir, ACTIVE_VERSION_MARKER);
-  if (existsSync(markerPath)) {
-    try {
-      const marked = readFileSync(markerPath, 'utf-8').trim();
-      if (marked && files.includes(marked)) return marked;
-    } catch {
-      // fall through to content comparison
-    }
-  }
-
-  // Fallback for installs predating the marker: compare the active binary contents
-  const activePath = join(storageDir, TERRAFORM_BINARY);
-  if (!existsSync(activePath)) return null;
-
-  try {
-    const activeData = readFileSync(activePath);
-    for (const file of files) {
-      const candidate = readFileSync(join(storageDir, file));
-      if (activeData.length === candidate.length && activeData.equals(candidate)) {
-        return file;
+  const { readdirSync } = require("fs") as typeof import("fs");
+  return readdirSync(storageDir)
+    .filter((file) => {
+      if (!file.startsWith(TERRAFORM_PREFIX)) return false;
+      if (file.split('_').length < 4) return false;
+      try {
+        const stats = statSync(join(storageDir, file));
+        if (!stats.isFile()) return false;
+        return process.platform === 'win32' || (stats.mode & 0o111) !== 0;
+      } catch {
+        return false;
       }
-    }
-  } catch {
-    // Ignore errors
+    })
+    .map((file) => {
+      const [, version, tfPlatform, tfArch] = file.replace(/\.exe$/, '').split('_');
+      const stats = statSync(join(storageDir, file));
+      return {
+        version,
+        fileName: file,
+        platform: tfPlatform,
+        arch: tfArch,
+        size: stats.size,
+        sha256: '',
+        installedAt: stats.mtimeMs,
+      };
+    });
+};
+
+// The active `terraform` is a symlink to the shim on POSIX (no 80 MB copies);
+// on Windows, where symlinks need privileges, it is the real binary copied once.
+const activateVersion = (fileName: string): void => {
+  // Resolve the shim relative to the running CLI (process.argv[1]); bundlers
+  // statically inline __dirname, so it cannot be used here.
+  const cliDir = join(process.argv[1] ? resolveDir(process.argv[1]) : STORAGE_DIR, '');
+  const shimPath = join(cliDir, 'shim.js');
+  const activePath = join(STORAGE_DIR, TERRAFORM_BINARY);
+  const targetPath = join(STORAGE_DIR, fileName);
+
+  rmSync(activePath, { force: true });
+  const nodeLink = join(STORAGE_DIR, 'terraform-node');
+  rmSync(nodeLink, { force: true });
+
+  if (process.platform !== 'win32' && existsSync(shimPath)) {
+    // `terraform` runs the shim with the same node binary that runs tfvm.
+    symlinkSync(process.execPath, nodeLink);
+    symlinkSync(shimPath, activePath);
+  } else {
+    const { copyFileSync } = require("fs") as typeof import("fs");
+    copyFileSync(targetPath, activePath);
   }
-  
-  return null;
+  setActive(fileName);
+};
+
+const resolveDir = (entryPath: string): string => {
+  const { dirname, resolve } = require("path") as typeof import("path");
+  return dirname(resolve(entryPath));
 };
 
 const addToPath = async (): Promise<void> => {
@@ -135,22 +147,50 @@ const addToPath = async (): Promise<void> => {
   print(message, 'info');
 };
 
-const handleDownloadFlow = async (version: string): Promise<void> => {
+const handleDownloadFlow = async (version: string, force = false): Promise<void> => {
   const executables = await listTerraformExecutables(version);
   
   const selectedPackageUrl = executables.length === 1
     ? (print(`Auto-detected package: ${executables[0].name}`, 'info'), executables[0].value)
     : await selectPackageUrl(executables);
   
-  await downloadTerraform(selectedPackageUrl, version);
+  const result = await downloadTerraform(selectedPackageUrl, version, { force });
+  
+  const { platform: tfPlatform, arch: tfArch } = parseFileName(result.baseName);
+  upsertVersion({
+    version,
+    fileName: result.baseName,
+    platform: tfPlatform,
+    arch: tfArch,
+    size: result.size,
+    sha256: result.sha256,
+    installedAt: Date.now(),
+  });
+  
   await addToPath();
 };
 
+const parseFileName = (fileName: string): { platform: string; arch: string } => {
+  const [, , tfPlatform = 'unknown', tfArch = 'unknown'] = fileName.split('_');
+  return { platform: tfPlatform.replace(/\.exe$/, ''), arch: tfArch.replace(/\.exe$/, '') };
+};
+
+const ensureManifestPopulated = (): void => {
+  if (readManifest().versions.length === 0) {
+    const scanned = scanForVersions(STORAGE_DIR);
+    if (scanned.length > 0) writeManifest({ versions: scanned, active: null });
+  }
+};
+
 // Exported commands
-export const list = async ({ remote }: { remote?: boolean } = {}): Promise<void> => {
+export const list = async ({ remote, json }: { remote?: boolean; json?: boolean } = {}): Promise<void> => {
   if (remote) {
     try {
       const versions = await fetchTerraformVersions();
+      if (json) {
+        console.log(JSON.stringify({ remote: versions }, null, 2));
+        return;
+      }
       print(`Terraform versions available at ${TERRAFORM_RELEASE_REPO}:`, 'success');
       
       const selectedVersion = await selectVersion(versions, "Select a version to download:");
@@ -163,97 +203,175 @@ export const list = async ({ remote }: { remote?: boolean } = {}): Promise<void>
     return;
   }
   
-  const files = getTerraformFiles();
+  ensureManifestPopulated();
+  const installed = listVersions();
+  const active = getActiveFileName();
   
-  if (files.length === 0) {
+  if (json) {
+    console.log(JSON.stringify({
+      versions: installed.map((v) => ({
+        version: v.version,
+        active: v.fileName === active,
+        platform: v.platform,
+        arch: v.arch,
+        size: v.size,
+      })),
+    }, null, 2));
+    return;
+  }
+  
+  if (installed.length === 0) {
     print(`No terraform executables found at ${STORAGE_DIR}`, 'error');
     print(`Use 'tfvm download' to install terraform versions`, 'info');
     return;
   }
   
   print(`Terraform executables at ${STORAGE_DIR}:`, 'success');
-  files.forEach(file => print(`• ${file}`, 'plain'));
+  installed.forEach((v) => {
+    const marker = v.fileName === active ? ' (active)' : '';
+    print(`• ${v.version}${marker} ${v.platform}/${v.arch} ${formatBytes(v.size)}`, 'plain');
+  });
 };
 
-export const download = async (version?: string): Promise<void> => {
+export const download = async (
+  version?: string,
+  { force = false }: { force?: boolean } = {}
+): Promise<void> => {
   try {
     if (version) {
       if (!isValidVersion(version)) {
         print(`Invalid version "${version}". Expected a version like 1.6.0 or 1.14.0-rc1.`, 'error');
         return;
       }
-      await handleDownloadFlow(version);
+      await handleDownloadFlow(version, force);
     } else {
       const versions = await fetchTerraformVersions();
       const selectedVersion = await selectVersion(versions);
-      await handleDownloadFlow(selectedVersion);
+      await handleDownloadFlow(selectedVersion, force);
     }
   } catch (error: any) {
     print(error.message, 'error');
   }
 };
 
-export const remove = async ({ all }: { all?: boolean } = {}): Promise<void> => {
-  if (!existsSync(STORAGE_DIR)) {
-    print(`Storage directory ${STORAGE_DIR} does not exist`, 'error');
-    return;
-  }
-
-  const files = getTerraformFiles();
-
-  if (files.length === 0) {
-    print(`No terraform versions found`, 'info');
-    return;
-  }
-
+export const remove = async (
+  { all, yes }: { all?: boolean; yes?: boolean } = {},
+  version?: string
+): Promise<void> => {
+  ensureManifestPopulated();
+  
   if (all) {
-    const confirmed = await confirmRemoveAll(STORAGE_DIR);
+    if (!existsSync(STORAGE_DIR)) {
+      print(`Storage directory ${STORAGE_DIR} does not exist`, 'error');
+      return;
+    }
+    const confirmed = yes || (await confirmRemoveAll(STORAGE_DIR));
     if (confirmed) {
       rmSync(STORAGE_DIR, { recursive: true, force: true });
       print("Cleaned up entire .tfvm directory!", 'success');
-      print(`Removed all terraform versions, the active-version marker, and any tfvm config stored at ${STORAGE_DIR}`, 'info');
+      print(`Removed all terraform versions, the manifest, and the active symlink at ${STORAGE_DIR}`, 'info');
     }
     return;
   }
   
-  const selectedFile = await selectFileToRemove(files);
-  const activeVersion = getActiveVersion(files);
+  const installed = listVersions();
   
-  if (activeVersion === selectedFile) {
+  if (installed.length === 0) {
+    print(`No terraform versions found`, 'info');
+    return;
+  }
+  
+  let selectedFile: string;
+  if (version) {
+    const entry = findVersion(version);
+    if (!entry) {
+      print(`Terraform ${version} is not installed`, 'error');
+      return;
+    }
+    selectedFile = entry.fileName;
+  } else {
+    selectedFile = await selectFileToRemove(installed.map((v) => v.fileName));
+  }
+  
+  const active = getActiveFileName();
+  if (active === selectedFile) {
     print(`Cannot remove ${selectedFile}: it is currently the active version`, 'error');
     print(`Switch to a different version first using 'tfvm use'`, 'info');
     return;
   }
   
   rmSync(join(STORAGE_DIR, selectedFile), { force: true });
+  removeVersion(selectedFile);
   print(`Removed ${selectedFile}`, 'success');
 };
 
-export const use = async (): Promise<void> => {
-  const files = getTerraformFiles();
+export const use = async (version?: string): Promise<void> => {
+  ensureManifestPopulated();
+  const installed = listVersions();
 
-  if (files.length === 0) {
+  if (installed.length === 0) {
     print(`No terraform executables at ${STORAGE_DIR}`, 'error');
     print(`Use 'tfvm download' to install terraform versions`, 'info');
     return;
   }
 
-  print(`Terraform executables available at ${STORAGE_DIR}:`, 'success');
-  const selectedFile = await listLocalTerraformFiles(files);
-
-  const sourcePath = join(STORAGE_DIR, selectedFile);
-  const terraformPath = join(STORAGE_DIR, TERRAFORM_BINARY);
-  
-  copyFileSync(sourcePath, terraformPath);
-  try {
-    chmodSync(terraformPath, '755');
-  } catch {
-    // Windows ignores POSIX modes; not fatal
+  let entry: InstalledVersion;
+  if (version) {
+    const match = findVersion(version);
+    if (!match) {
+      print(`Terraform ${version} is not installed. Run: tfvm download ${version}`, 'error');
+      return;
+    }
+    entry = match;
+  } else {
+    const selectedFile = await listLocalTerraformFiles(installed.map((v) => v.fileName));
+    entry = installed.find((v) => v.fileName === selectedFile)!;
   }
-  setActiveVersion(selectedFile);
-  
-  print(`Now using ${selectedFile} as '${TERRAFORM_BINARY}'!`, 'success');
+
+  if (!existsSync(join(STORAGE_DIR, entry.fileName))) {
+    print(`${entry.fileName} is missing from ${STORAGE_DIR}. Re-download it with --force.`, 'error');
+    return;
+  }
+
+  activateVersion(entry.fileName);
+  print(`Now using Terraform ${entry.version}!`, 'success');
   await addToPath();
+};
+
+export const pin = async (version?: string): Promise<void> => {
+  let target = version;
+  if (!target) {
+    const active = getActiveFileName();
+    const activeEntry = active ? listVersions().find((v) => v.fileName === active) : null;
+    target = activeEntry?.version;
+    if (!target) {
+      print(`No active version to pin. Run 'tfvm use <version>' first, or pass a version.`, 'error');
+      return;
+    }
+  }
+
+  if (!isValidVersion(target)) {
+    print(`Invalid version "${target}". Expected a version like 1.6.0.`, 'error');
+    return;
+  }
+
+  if (findVersion(target)) {
+    print(`Terraform ${target} is installed locally`, 'info');
+  } else {
+    print(`Note: Terraform ${target} is not installed yet. Run 'tfvm download ${target}'.`, 'info');
+  }
+
+  writeFileSync(join(process.cwd(), PIN_FILE), `${target}\n`);
+  print(`Pinned ${process.cwd()} to Terraform ${target} (${PIN_FILE})`, 'success');
+};
+
+export const which = (): void => {
+  const active = getActiveFileName();
+  if (!active) {
+    print(`No active Terraform version. Run 'tfvm use' or pin a project with 'tfvm pin'.`, 'error');
+    return;
+  }
+  print(join(STORAGE_DIR, active), 'success');
 };
 
 export const dir = (): void => {

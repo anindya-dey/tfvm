@@ -26,7 +26,7 @@
     "infrastructure"
   ],
   "bin": {
-    "tfvm": "./dist/tfvm.js"
+    "tfvm": "./dist/cli.js"
   },
   "files": [
     "dist/",
@@ -34,10 +34,10 @@
     "LICENSE"
   ],
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
   },
   "scripts": {
-    "build": "bun build ./src/cli.ts --outfile=dist/tfvm.js --target=node --format=cjs --minify --external picocolors --external node-html-parser --external citty --external @clack/prompts --external fflate",
+    "build": "bun build ./src/cli.ts ./src/shim.ts --outdir=dist --target=node --format=cjs --minify --external picocolors --external node-html-parser --external citty --external @clack/prompts --external fflate && chmod +x dist/cli.js dist/shim.js",
     "dev": "bun run --watch src/cli.ts",
     "start": "bun run src/cli.ts",
     "test": "bun test",
@@ -57,15 +57,15 @@
     "release": "./scripts/release.sh"
   },
   "dependencies": {
-    "@clack/prompts": "^0.11.0",
-    "citty": "^0.1.6",
+    "@clack/prompts": "^1.8.1",
+    "citty": "^0.2.2",
     "fflate": "^0.8.3",
-    "node-html-parser": "^7.1.0",
+    "node-html-parser": "^9.0.4",
     "picocolors": "^1.1.1"
   },
   "devDependencies": {
-    "@types/bun": "^1.3.11",
-    "@types/node": "^25.0.3",
-    "typescript": "^5.9.3"
+    "@types/bun": "^1.4.2",
+    "@types/node": "^26.6.5",
+    "typescript": "^7.0.2"
   }
 }
