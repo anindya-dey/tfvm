@@ -1,9 +1,12 @@
 import * as clack from "@clack/prompts";
 import { TerraformExecutable } from "./services";
 
-export const selectVersion = async (versions: string[]): Promise<string> => {
+export const selectVersion = async (
+  versions: string[],
+  message = "Which version do you want to download?"
+): Promise<string> => {
   const result = await clack.select({
-    message: "Which version do you want to download?",
+    message,
     options: versions.map(v => ({ value: v, label: v })),
   });
   
@@ -41,20 +44,6 @@ export const confirmDownload = async (version: string, packageName: string): Pro
   }
   
   return result as boolean;
-};
-
-export const listVersion = async (versions: string[], title: string): Promise<string> => {
-  const result = await clack.select({
-    message: title,
-    options: versions.map(v => ({ value: v, label: v })),
-  });
-  
-  if (clack.isCancel(result)) {
-    clack.cancel("Operation cancelled");
-    process.exit(0);
-  }
-  
-  return result as string;
 };
 
 export const confirmRemoveAll = async (storagePath: string): Promise<boolean> => {

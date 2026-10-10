@@ -130,11 +130,18 @@ const main = defineCommand({
   },
 });
 
+const FAST_PATH_FLAGS = new Set(["--version", "-v", "--help", "-h"]);
+
 // Initialize the CLI
 const init = async () => {
-  // Check for updates (non-blocking)
-  checkForUpdates(pkg.version);
-  
+  const isFastPath = process.argv.slice(2).some((arg) => FAST_PATH_FLAGS.has(arg));
+
+  // Await the update check so its banner prints before command output and the
+  // cache is actually persisted. Skipped for --version/--help to stay instant.
+  if (!isFastPath) {
+    await checkForUpdates(pkg.version);
+  }
+
   // Run the CLI
   await runMain(main);
 };

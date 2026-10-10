@@ -16,11 +16,6 @@ describe("Prompts", () => {
     expect(typeof confirmDownload).toBe("function");
   });
 
-  test("should export listVersion", async () => {
-    const { listVersion } = await import("../src/prompts");
-    expect(typeof listVersion).toBe("function");
-  });
-
   test("should export confirmRemoveAll", async () => {
     const { confirmRemoveAll } = await import("../src/prompts");
     expect(typeof confirmRemoveAll).toBe("function");

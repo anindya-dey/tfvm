@@ -1,23 +1,24 @@
 import { describe, test, expect } from "bun:test";
 import os from "os";
+import { mapPlatform, mapArch } from "../src/services";
 
-// Mock the services module to test platform filtering
+// These tests exercise the real mapping used by services.ts so they fail if the
+// production mapping drifts, instead of asserting against a duplicated copy.
 describe("Platform Filtering Logic", () => {
   test("should correctly map Node.js platforms to Terraform platforms", () => {
-    const mappings = {
+    const mappings: Record<string, string> = {
       win32: "windows",
       darwin: "darwin",
       linux: "linux",
     };
 
     Object.entries(mappings).forEach(([nodePlatform, terraformPlatform]) => {
-      expect(terraformPlatform).toBeDefined();
-      expect(typeof terraformPlatform).toBe("string");
+      expect(mapPlatform(nodePlatform)).toBe(terraformPlatform);
     });
   });
 
   test("should correctly map Node.js architectures to Terraform architectures", () => {
-    const mappings = {
+    const mappings: Record<string, string> = {
       x64: "amd64",
       arm64: "arm64",
       arm: "arm",
@@ -25,8 +26,7 @@ describe("Platform Filtering Logic", () => {
     };
 
     Object.entries(mappings).forEach(([nodeArch, terraformArch]) => {
-      expect(terraformArch).toBeDefined();
-      expect(typeof terraformArch).toBe("string");
+      expect(mapArch(nodeArch)).toBe(terraformArch);
     });
   });
 
@@ -77,25 +77,8 @@ describe("Platform Filtering Logic", () => {
   });
 
   test("should filter packages correctly for current platform", () => {
-    const currentPlatform = os.platform();
-    const currentArch = os.arch();
-
-    // Map to Terraform identifiers
-    const platformMap: Record<string, string> = {
-      win32: "windows",
-      darwin: "darwin",
-      linux: "linux",
-    };
-
-    const archMap: Record<string, string> = {
-      x64: "amd64",
-      arm64: "arm64",
-      arm: "arm",
-      ia32: "386",
-    };
-
-    const expectedPlatform = platformMap[currentPlatform] || "linux";
-    const expectedArch = archMap[currentArch] || "amd64";
+    const expectedPlatform = mapPlatform(os.platform()) ?? "linux";
+    const expectedArch = mapArch(os.arch()) ?? "amd64";
     const expectedPattern = `${expectedPlatform}_${expectedArch}`;
 
     // Simulate real packages
@@ -113,18 +96,9 @@ describe("Platform Filtering Logic", () => {
   });
 
   test("should handle edge cases gracefully", () => {
-    // Unknown platform should default to linux
-    const unknownPlatform = "freebsd"; // Not in our mapping
-    const defaultPlatform = "linux"; // Expected default
-
-    // Test that we have a sensible default
-    expect(defaultPlatform).toBe("linux");
-
-    // Unknown arch should default to amd64
-    const unknownArch = "mips"; // Not in our mapping
-    const defaultArch = "amd64"; // Expected default
-
-    expect(defaultArch).toBe("amd64");
+    // Unknown platform/arch map to null, which triggers the "show all" fallback
+    expect(mapPlatform("freebsd")).toBeNull();
+    expect(mapArch("mips")).toBeNull();
   });
 
   test("should correctly identify zip packages", () => {

@@ -19,7 +19,7 @@
 
 ## ✨ What's New in v2.0
 
-- ⚡ **Faster & Lighter** - Reduced bundle size to ~9KB (98% smaller!)
+- ⚡ **Faster & Lighter** - Reduced bundle size to ~16KB (97% smaller!)
 - 🔄 **Auto-Update Check** - Get notified when new versions are available
 - 🌐 **Modern APIs** - Built with Fetch API for Node.js 18+ compatibility
 - 🧪 **Better Testing** - Comprehensive test suite with Bun test runner
@@ -74,9 +74,10 @@ $ tfvm list
 - 🎯 **Interactive prompts** - User-friendly selection menus and confirmations
 - 🗂️ **Local management** - Keep multiple versions locally and switch as needed
 - 🖥️ **Cross-platform** - Works on Windows, macOS, and Linux
-- ⚡ **Fast & lightweight** - Optimized bundle size (~9KB) with minimal dependencies
+- ⚡ **Fast & lightweight** - Optimized bundle size (~16KB) with minimal dependencies
 - 🔧 **Configurable** - Customize storage directory via configuration files
 - 🛡️ **Safe operations** - Confirmation prompts for destructive actions
+- 🔐 **Integrity verification** - Downloads are verified against HashiCorp's published SHA256 checksums
 - 🔍 **Version discovery** - Browse all available Terraform releases
 - 📊 **Smart filtering** - Automatically handles platform-specific downloads
 - 🔔 **Update notifications** - Get notified when new TFVM versions are available
@@ -327,7 +328,7 @@ npm link
 
 **Production:**
 - Bundled to CommonJS for broad Node.js compatibility
-- Minified output (~11KB)
+- Minified output (~16KB)
 - Node.js 18+ required (uses native Fetch API)
 - Zero TypeScript runtime dependencies
 - Modern, lightweight dependencies
@@ -341,7 +342,8 @@ TFVM organizes Terraform versions in your home directory:
 ├── terraform_1.5.0      # Terraform v1.5.0 executable
 ├── terraform_1.6.0      # Terraform v1.6.0 executable  
 ├── terraform_1.7.0      # Terraform v1.7.0 executable
-├── terraform            # Symlink to currently active version
+├── terraform            # Copy of the currently active version (terraform.exe on Windows)
+├── .active-version      # Name of the active version (auto-managed)
 └── .version-check       # Update check cache (auto-managed)
 ```
 
@@ -517,8 +519,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📈 Project Stats
 
-- 🎯 **Bundle Size**: ~11KB (minified)
-- 🧪 **Test Coverage**: 28 passing tests
+- 🎯 **Bundle Size**: ~16KB (minified)
+- 🧪 **Test Coverage**: 60 passing tests
 - 📦 **Dependencies**: 5 runtime, 3 dev
 - 🚀 **Performance**: Built with modern Fetch API
 - ⚡ **Development**: Powered by Bun

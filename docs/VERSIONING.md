@@ -148,12 +148,26 @@ Example: `2.0.0` → `2.0.1-beta.0`
 
 ## GitHub Actions Automation
 
-When you push a tag (e.g., `v2.1.0`), GitHub Actions automatically:
+Publishing to npm is triggered by **publishing a GitHub Release**, not by pushing
+a tag alone (see `.github/workflows/release.yml`, which runs on `release: published`).
+When you publish a GitHub Release for a tag (e.g., `v2.1.0`), GitHub Actions:
 
-1. Runs all tests
-2. Builds the project
-3. Creates a GitHub Release with notes
-4. Publishes to npm registry
+1. Installs dependencies
+2. Runs the test suite
+3. Builds the project
+4. Publishes the package to the npm registry
+
+To publish a release:
+
+```bash
+# 1. Tag + push (done by ./scripts/release.sh, or manually)
+git tag v2.1.0 && git push origin v2.1.0
+
+# 2. Create and publish the GitHub Release (this triggers npm publish)
+gh release create v2.1.0 --notes-file .github/RELEASE_NOTES_v2.1.0.md
+```
+
+The `release.yml` workflow requires the `NPM_TOKEN` repository secret to be set.
 
 ## Commit Message Convention
 

@@ -1,13 +1,14 @@
-import { readFile, writeFile } from "fs/promises";
+import { readFile, writeFile, mkdir } from "fs/promises";
 import { existsSync } from "fs";
 import { join } from "path";
-import { homedir } from "os";
+import { STORAGE_DIR } from "./config";
 import { printInfo } from "./utils";
 
-const CACHE_DIR = join(homedir(), ".tfvm");
-const VERSION_CACHE_FILE = join(CACHE_DIR, ".version-check");
+const VERSION_CACHE_FILE = join(STORAGE_DIR, ".version-check");
 const CHECK_INTERVAL = 1000 * 60 * 60 * 24; // 24 hours
 const NPM_REGISTRY_URL = "https://registry.npmjs.org/tfvm/latest";
+const UPDATE_CHECK_TIMEOUT_MS = 2_000;
+const BOX_WIDTH = 58;
 
 interface VersionCache {
   lastCheck: number;
@@ -15,10 +16,17 @@ interface VersionCache {
 }
 
 const fetchLatestVersion = async (): Promise<string> => {
-  const response = await fetch(NPM_REGISTRY_URL);
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  const pkg = await response.json();
-  return pkg.version;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), UPDATE_CHECK_TIMEOUT_MS);
+  try {
+    const response = await fetch(NPM_REGISTRY_URL, { signal: controller.signal });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const pkg = (await response.json()) as { version?: string };
+    if (!pkg.version) throw new Error("Malformed registry response");
+    return pkg.version;
+  } finally {
+    clearTimeout(timer);
+  }
 };
 
 const shouldCheck = async (): Promise<boolean> => {
@@ -39,18 +47,47 @@ const updateCache = async (latestVersion: string): Promise<void> => {
     latestVersion
   };
   
+  await mkdir(STORAGE_DIR, { recursive: true });
   await writeFile(VERSION_CACHE_FILE, JSON.stringify(cache));
 };
 
-const compareVersions = (current: string, latest: string): boolean => {
-  const parseCurrent = current.split('.').map(Number);
-  const parseLatest = latest.split('.').map(Number);
-  
-  for (let i = 0; i < 3; i++) {
-    if (parseLatest[i] > parseCurrent[i]) return true;
-    if (parseLatest[i] < parseCurrent[i]) return false;
+// Returns true when `latest` is a newer semver than `current`.
+// Prerelease identifiers are ignored and malformed parts fall back to 0.
+export const compareVersions = (current: string, latest: string): boolean => {
+  const normalize = (value: string): number[] =>
+    value
+      .trim()
+      .split('-')[0]
+      .split('.')
+      .map((part) => {
+        const parsed = parseInt(part, 10);
+        return Number.isNaN(parsed) ? 0 : parsed;
+      });
+
+  const currentParts = normalize(current);
+  const latestParts = normalize(latest);
+  const length = Math.max(currentParts.length, latestParts.length);
+
+  for (let i = 0; i < length; i++) {
+    const currentPart = currentParts[i] ?? 0;
+    const latestPart = latestParts[i] ?? 0;
+    if (latestPart > currentPart) return true;
+    if (latestPart < currentPart) return false;
   }
   return false;
+};
+
+const renderUpdateBox = (currentVersion: string, latestVersion: string): void => {
+  const lines = [
+    `Update available: ${currentVersion} → ${latestVersion}`,
+    `Run: npm install -g tfvm`,
+  ];
+  const border = '─'.repeat(BOX_WIDTH);
+  printInfo(`┌${border}┐`);
+  for (const line of lines) {
+    printInfo(`│  ${line}${' '.repeat(Math.max(0, BOX_WIDTH - line.length - 2))}│`);
+  }
+  printInfo(`└${border}┘`);
 };
 
 export const checkForUpdates = async (currentVersion: string): Promise<void> => {
@@ -62,10 +99,7 @@ export const checkForUpdates = async (currentVersion: string): Promise<void> => 
     
     if (compareVersions(currentVersion, latestVersion)) {
       console.log('');
-      printInfo(`┌${'─'.repeat(58)}┐`);
-      printInfo(`│  Update available: ${currentVersion} → ${latestVersion}${' '.repeat(58 - 28 - currentVersion.length - latestVersion.length)}│`);
-      printInfo(`│  Run: npm install -g tfvm${' '.repeat(30)}│`);
-      printInfo(`└${'─'.repeat(58)}┘`);
+      renderUpdateBox(currentVersion, latestVersion);
       console.log('');
     }
   } catch {

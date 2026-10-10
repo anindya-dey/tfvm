@@ -20,11 +20,11 @@ export const print = (message: string, type: PrintType = 'plain'): void => {
   }
 };
 
-// Legacy exports for backward compatibility (can be removed later)
-export const printSuccess = (message: string) => print(message, 'success');
-export const printError = (message: string) => print(message, 'error');
 export const printInfo = (message: string) => print(message, 'info');
-export const printPlainText = (text: string) => print(text, 'plain');
+
+// Validate a user-supplied Terraform version before it is used in a URL/path
+export const isValidVersion = (version: string): boolean =>
+  /^[0-9]+\.[0-9]+\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$/.test(version.trim());
 
 // Terraform link validation
 export const isTerraformLink = (linkHref: string | null | undefined): boolean => {

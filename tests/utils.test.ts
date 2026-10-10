@@ -1,5 +1,5 @@
 import { describe, test, expect } from "bun:test";
-import { extractTerraformVersion, isTerraformLink, isZipPackage } from "../src/utils";
+import { extractTerraformVersion, isTerraformLink, isZipPackage, isValidVersion } from "../src/utils";
 
 describe("Utils", () => {
   describe("extractTerraformVersion", () => {
@@ -36,6 +36,22 @@ describe("Utils", () => {
     test("should reject invalid packages", () => {
       expect(isZipPackage("terraform.tar.gz")).toBe(false);
       expect(isZipPackage(null)).toBe(false);
+    });
+  });
+
+  describe("isValidVersion", () => {
+    test("accepts plain and prerelease versions", () => {
+      expect(isValidVersion("1.6.0")).toBe(true);
+      expect(isValidVersion("1.14.0-rc1")).toBe(true);
+      expect(isValidVersion("1.6.0-beta.2")).toBe(true);
+    });
+
+    test("rejects malformed or unsafe version strings", () => {
+      expect(isValidVersion("")).toBe(false);
+      expect(isValidVersion("1.6")).toBe(false);
+      expect(isValidVersion("../etc/passwd")).toBe(false);
+      expect(isValidVersion("1.6.0/../../x")).toBe(false);
+      expect(isValidVersion("latest")).toBe(false);
     });
   });
 });
