@@ -143,6 +143,11 @@ const foreignTerraformInPath = (): string | null => {
   return null;
 };
 
+// Quote a value for safe inclusion in a POSIX shell config so a crafted
+// storage path (e.g. containing " or $(...)) cannot inject commands.
+const shellSingleQuote = (value: string): string =>
+  `'${value.replace(/'/g, `'\\''`)}'`;
+
 const addToPath = async (): Promise<void> => {
   if (process.platform === 'win32') {
     print(`To use terraform globally on Windows:`, 'info');
@@ -154,7 +159,7 @@ const addToPath = async (): Promise<void> => {
   }
   
   const home = homedir();
-  const pathExport = `\n# Added by tfvm\nexport PATH="${STORAGE_DIR}:$PATH"\n`;
+  const pathExport = `\n# Added by tfvm\nexport PATH=${shellSingleQuote(STORAGE_DIR)}:"$PATH"\n`;
   const shellPaths = SHELL_FILES.map(file => join(home, file)).filter(existsSync);
   
   let updated = false;

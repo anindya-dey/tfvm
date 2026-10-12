@@ -12,7 +12,7 @@
 import { existsSync, readFileSync, realpathSync } from "fs";
 import { join, dirname, resolve } from "path";
 import { spawn } from "child_process";
-import { homedir, platform } from "os";
+import { homedir } from "os";
 
 interface Manifest {
   versions: Array<{ version: string; fileName: string }>;
@@ -112,10 +112,11 @@ const resolveBinary = (): string => {
 
 const binary = resolveBinary();
 
+// No shell: argv is passed directly to the binary, so shell metacharacters in
+// arguments can never be interpreted (avoids command injection).
 const child = spawn(binary, process.argv.slice(2), {
   stdio: "inherit",
-  // Windows needs shell:true for .exe resolution in some environments; harmless elsewhere.
-  shell: platform() === "win32",
+  shell: false,
 });
 
 child.on("error", (err: Error) => fail(`could not run Terraform: ${err.message}`));

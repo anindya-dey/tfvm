@@ -5,7 +5,7 @@ import { arch, platform } from "os";
 import { Readable, Transform } from "stream";
 import { pipeline } from "stream/promises";
 import { createHash } from "crypto";
-import { TERRAFORM_RELEASE_REPO, STORAGE_DIR } from "./config";
+import { TERRAFORM_RELEASE_REPO, DEFAULT_TERRAFORM_RELEASE_REPO, STORAGE_DIR } from "./config";
 import { isTerraformLink, extractTerraformVersion, isZipPackage, print } from "./utils";
 
 export interface TerraformExecutable {
@@ -143,17 +143,28 @@ const verifyChecksum = async (
   version: string,
   actualSha256: string
 ): Promise<void> => {
+  // The default HashiCorp repo always publishes SHA256SUMS, so verification
+  // failing there is treated as fatal (fail closed). Custom mirrors may not
+  // publish checksums, so they degrade to a warning.
+  const isDefaultRepo = TERRAFORM_RELEASE_REPO === DEFAULT_TERRAFORM_RELEASE_REPO;
+
   let checksums: Map<string, string>;
   try {
     checksums = await fetchChecksums(version);
-  } catch {
-    print(`Could not fetch checksums for ${version}; skipping verification`, "info");
+  } catch (err: any) {
+    if (isDefaultRepo) {
+      throw new Error(`Could not fetch checksums for ${version}: ${err.message}`);
+    }
+    print(`Could not fetch checksums for ${version}; skipping verification (custom repo)`, "info");
     return;
   }
 
   const expected = checksums.get(fileName);
   if (!expected) {
-    print(`No checksum published for ${fileName}; skipping verification`, "info");
+    if (isDefaultRepo) {
+      throw new Error(`No published checksum for ${fileName}; refusing to install`);
+    }
+    print(`No checksum published for ${fileName}; skipping verification (custom repo)`, "info");
     return;
   }
 
@@ -161,6 +172,32 @@ const verifyChecksum = async (
     throw new Error(`Checksum mismatch for ${fileName} (expected ${expected}, got ${actualSha256})`);
   }
   print(`Verified SHA256 checksum for ${fileName}`, "success");
+};
+
+// Extracts only the terraform binary from an archive. Entry names are
+// allowlisted, which prevents zip-slip (a crafted archive with "../" entries
+// writing outside the storage directory) and avoids writing stray files.
+export const extractTerraformBinary = async (
+  unzipped: Record<string, Uint8Array>,
+  baseName: string,
+  storageDir: string = STORAGE_DIR
+): Promise<boolean> => {
+  const targetNames: Record<string, string> = {
+    "terraform": baseName,
+    "terraform.exe": `${baseName}.exe`,
+  };
+
+  let extracted = false;
+  for (const [entryName, data] of Object.entries(unzipped)) {
+    const extractName = targetNames[entryName];
+    if (!extractName) continue; // ignore LICENSE.txt and any unexpected entries
+
+    const extractPath = join(storageDir, extractName);
+    await writeFile(extractPath, data);
+    await chmod(extractPath, 0o755);
+    extracted = true;
+  }
+  return extracted;
 };
 
 export const fetchTerraformVersions = async (): Promise<string[]> => {
@@ -273,15 +310,9 @@ export const downloadTerraform = async (
     const zipData = await readFile(zipPath);
     const unzipped = await lazyUnzip(new Uint8Array(zipData));
 
-    // Process extracted files
-    for (const [entryName, data] of Object.entries(unzipped)) {
-      let extractName = entryName;
-      if (entryName === "terraform") extractName = baseName;
-      else if (entryName === "terraform.exe") extractName = `${baseName}.exe`;
-
-      const extractPath = join(STORAGE_DIR, extractName);
-      await writeFile(extractPath, data);
-      await chmod(extractPath, 0o755);
+    const extracted = await extractTerraformBinary(unzipped, baseName);
+    if (!extracted) {
+      throw new Error(`Archive ${fileName} did not contain a terraform binary`);
     }
 
     await unlink(zipPath);
